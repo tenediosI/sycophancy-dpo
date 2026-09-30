@@ -18,6 +18,7 @@ seed: 0
 paths:
   artifacts: artifacts
   splits: ${paths.artifacts}/splits
+  eval_sets: ${paths.artifacts}/eval_sets
   preferences: ${paths.artifacts}/preferences
   checkpoints: ${paths.artifacts}/checkpoints
   results: ${paths.artifacts}/results

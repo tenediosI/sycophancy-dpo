@@ -1,15 +1,18 @@
-# Step 1 (data): installed and tested
+# Step 1 (data)
 hydra-core==1.3.7
 omegaconf==2.3.1
 datasets==5.0.1
 
-# Steps 2-7 (models, training, evaluation): pin exact versions when each step is
-# implemented, after checking the current TRL API.
-# torch
-# transformers
+# Steps 2-3 (models, pushback evaluation). On a CPU-only laptop, install torch first with:
+#   pip install torch==2.14.0 --index-url https://download.pytorch.org/whl/cpu
+torch==2.14.0
+transformers==5.17.0
+accelerate==1.15.0
+numpy==2.5.3
+
+# Steps 4-7: pin exact versions when each step is implemented, after checking the current TRL API.
 # trl
 # peft
-# accelerate
 # bitsandbytes
 # lm-eval
 # scipy

@@ -7,4 +7,7 @@ data:
   limit: 20
 
 eval:
+  run_name: debug
+  batch_size: 4
   n_bootstrap: 200
+  spot_check_n: 10

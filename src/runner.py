@@ -13,6 +13,9 @@ from src.data.loaders import load_arc
 from src.data.splitter import split_by_question
 from src.io_utils import read_jsonl, write_jsonl
 
+# Model-dependent imports (torch, transformers) happen inside the stages that need
+# them, so `stage=split` works without installing the ML stack.
+
 log = logging.getLogger(__name__)
 
 
@@ -50,6 +53,38 @@ def run_split(cfg: DictConfig) -> None:
     log.info("Wrote splits to %s: %s", out_dir, json.dumps(manifest["counts"]))
 
 
+def run_evaluate(cfg: DictConfig) -> None:
+    """Steps 2-3 (and later 7): pushback evaluation with bootstrap CIs."""
+    from src.evaluation.pushback_eval import build_eval_set, run_pushback, spot_check_report, summarise
+    from src.models.factory import load_model
+
+    records = load_split(cfg, cfg.eval.split)
+    model, tokenizer = load_model(cfg.model)
+
+    # Turn 1 comes from the base model and is shared by every model evaluated later.
+    model_slug = cfg.model.name.split("/")[-1]
+    eval_set_path = Path(cfg.paths.eval_sets) / f"{cfg.eval.split}_{model_slug}_n{len(records)}.jsonl"
+    if eval_set_path.exists():
+        items = read_jsonl(eval_set_path)
+        log.info("Reusing eval set %s", eval_set_path)
+    else:
+        items = build_eval_set(records, model, tokenizer, cfg)
+        write_jsonl(eval_set_path, items)
+        log.info("Wrote eval set %s", eval_set_path)
+
+    rows = run_pushback(items, model, tokenizer, cfg)
+    summary = {"model": cfg.model.name, "split": cfg.eval.split, "eval_set": str(eval_set_path)}
+    summary |= summarise(items, rows, cfg)
+
+    out_dir = Path(cfg.paths.results) / cfg.eval.run_name / cfg.eval.split
+    write_jsonl(out_dir / "turn3.jsonl", rows)
+    (out_dir / "summary.json").write_text(json.dumps(summary, indent=2))
+    (out_dir / "spot_check.md").write_text(
+        spot_check_report(items, rows, cfg.eval.spot_check_n, cfg.eval.eval_set_seed), encoding="utf-8"
+    )
+    log.info("Results in %s:\n%s", out_dir, json.dumps(summary, indent=2))
+
+
 def not_implemented(step: str):
     def stage(cfg: DictConfig) -> None:
         raise NotImplementedError(f"{step} is not implemented yet.")
@@ -62,7 +97,7 @@ STAGES = {
     "generate": not_implemented("Step 4 (preference data generation)"),
     "sft": not_implemented("Step 5 (SFT warm-up)"),
     "dpo": not_implemented("Step 6 (DPO training)"),
-    "evaluate": not_implemented("Steps 2-3 / 7 (pushback evaluation)"),
+    "evaluate": run_evaluate,
     "analyse": not_implemented("Step 7 (statistics across seeds)"),
 }
 
