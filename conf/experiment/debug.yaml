@@ -1,0 +1,10 @@
+# @package _global_
+# Tiny end-to-end run on a laptop CPU to check the code works: python run.py experiment=debug stage=...
+defaults:
+  - override /model: qwen2.5-0.5b-instruct
+
+data:
+  limit: 20
+
+eval:
+  n_bootstrap: 200

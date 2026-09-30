@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+.ipynb_checkpoints/
+
+# Hydra run folders
+outputs/
+multirun/
+
+# Generated artefacts. The splits are small and are committed for reproducibility.
+artifacts/*
+!artifacts/splits/

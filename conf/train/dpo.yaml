@@ -1,0 +1,9 @@
+# Starting points from the project guide. Tune on validation, never on test.
+method: dpo
+init_from: base        # base | sft (start from the SFT checkpoint)
+beta: 0.1
+learning_rate: 5.0e-6
+num_train_epochs: 1
+per_device_train_batch_size: 4
+gradient_accumulation_steps: 4
+max_length: 1024

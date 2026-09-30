@@ -1,0 +1,23 @@
+{
+  "dataset": "arc",
+  "split_seed": 42,
+  "n_loaded": 7787,
+  "n_duplicates_dropped": 35,
+  "counts": {
+    "train": {
+      "total": 5427,
+      "ARC-Easy": 3625,
+      "ARC-Challenge": 1802
+    },
+    "val": {
+      "total": 775,
+      "ARC-Easy": 518,
+      "ARC-Challenge": 257
+    },
+    "test": {
+      "total": 1550,
+      "ARC-Easy": 1035,
+      "ARC-Challenge": 515
+    }
+  }
+}

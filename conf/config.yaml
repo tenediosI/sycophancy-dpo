@@ -1,0 +1,23 @@
+defaults:
+  - model: qwen2.5-1.5b-instruct
+  - data: arc
+  - pushback: default
+  - train: dpo
+  - eval: pushback
+  - _self_
+  - experiment: null   # e.g. experiment=debug for a tiny CPU run on the laptop
+
+# Which pipeline stage to run: split | generate | sft | dpo | evaluate | analyse
+stage: split
+
+# Seed for generation and training. The data split has its own fixed seed
+# (data.split_seed) so every training seed sees the same train/val/test split.
+seed: 0
+
+# Shared artefacts that stages hand to each other. Relative to the repo root.
+paths:
+  artifacts: artifacts
+  splits: ${paths.artifacts}/splits
+  preferences: ${paths.artifacts}/preferences
+  checkpoints: ${paths.artifacts}/checkpoints
+  results: ${paths.artifacts}/results

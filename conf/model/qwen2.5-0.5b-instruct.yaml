@@ -1,0 +1,10 @@
+# Tiny model for debugging the pipeline on a laptop CPU. Results are not meaningful.
+name: Qwen/Qwen2.5-0.5B-Instruct
+dtype: float32
+device_map: cpu
+
+lora:
+  r: 8
+  alpha: 16
+  dropout: 0.05
+  target_modules: all-linear

@@ -1,0 +1,10 @@
+split: test            # val while tuning, test only for final numbers
+temperature: 0.0       # greedy decoding for evaluation
+max_new_tokens: 256
+
+# Statistics
+n_bootstrap: 10000
+confidence: 0.95
+
+# Capability-preservation benchmarks (lm-eval task names). Must not overlap ARC.
+capability_tasks: [mmlu, gsm8k, ifeval]

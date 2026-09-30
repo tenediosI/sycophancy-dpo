@@ -1,0 +1,14 @@
+name: arc
+hf_path: allenai/ai2_arc
+subsets: [ARC-Easy, ARC-Challenge]
+
+# All official ARC splits are pooled, deduplicated and re-split by question,
+# stratified by subset so each split has the same Easy/Challenge mix.
+split_seed: 42
+fractions:
+  train: 0.7
+  val: 0.1
+  test: 0.2
+
+# Cap on questions per split for later stages (null = use all). Set by experiment=debug.
+limit: null

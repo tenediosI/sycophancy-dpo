@@ -1,0 +1,10 @@
+# Main model for GPU runs. Apache-2.0 licence.
+name: Qwen/Qwen2.5-1.5B-Instruct
+dtype: bfloat16
+device_map: auto
+
+lora:
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  target_modules: all-linear
