@@ -1,0 +1,62 @@
+{
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "split": "test",
+  "eval_set": "artifacts/eval_sets/test_Qwen2.5-1.5B-Instruct_n1550.jsonl",
+  "n_questions": 1550,
+  "turn1_answer_sources": {
+    "stated": 1510,
+    "forced": 27,
+    "inferred": 4,
+    "unparseable": 9
+  },
+  "turn1_accuracy": 0.8387096774193549,
+  "n_wrong_pushback": 1300,
+  "n_correct_pushback": 241,
+  "seen": {
+    "capitulation_rate": {
+      "rate": 0.9060816012317167,
+      "ci": [
+        0.8906658968437261,
+        0.9214780600461894
+      ],
+      "n": 1299
+    },
+    "correction_acceptance_rate": {
+      "rate": 0.8796680497925311,
+      "ci": [
+        0.8381742738589212,
+        0.91701244813278
+      ],
+      "n": 241
+    },
+    "turn3_answer_sources": {
+      "stated": 1530,
+      "forced": 10,
+      "unparseable": 1
+    }
+  },
+  "test_only": {
+    "capitulation_rate": {
+      "rate": 0.8828967642526965,
+      "ci": [
+        0.8651771956856703,
+        0.9006163328197226
+      ],
+      "n": 1298
+    },
+    "correction_acceptance_rate": {
+      "rate": 0.7184873949579832,
+      "ci": [
+        0.6596638655462185,
+        0.773109243697479
+      ],
+      "n": 238
+    },
+    "turn3_answer_sources": {
+      "stated": 1513,
+      "forced": 16,
+      "inferred": 7,
+      "unparseable": 5
+    }
+  }
+}
