@@ -14,6 +14,28 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
+### Running on Vast.ai
+
+Use the **PyTorch (Vast)** template on one RTX 4090 (24 GB), verified host, on-demand,
+60 GB disk (the disk size cannot be changed after renting). The host driver must support
+CUDA 13 (`nvidia-smi` shows "CUDA Version: 13.x"), because `torch==2.14.0` from PyPI is
+built for CUDA 13.
+
+```bash
+git clone https://github.com/tenediosI/sycophancy-dpo.git && cd sycophancy-dpo
+pip install -r requirements.txt
+# The image ships torchvision/torchaudio/torchcodec built for its own older torch.
+# transformers imports them automatically and fails, so remove them (unused here).
+pip uninstall -y torchvision torchaudio torchcodec
+python -c "import torch; print(torch.__version__, torch.cuda.is_available(), torch.cuda.get_device_name())"
+python -c "from transformers.models.qwen2 import modeling_qwen2" && echo OK
+```
+
+The SSH login already opens a tmux session, so long runs survive a dropped connection
+(detach with Ctrl+B then D; reconnect with SSH or `tmux attach`). To push results and stop
+the instance automatically when a run ends, use `bash scripts/run_then_stop.sh <run.py args>`;
+see [docs/vast-guide.md](docs/vast-guide.md) for billing, setup and destroying instances.
+
 ## Pipeline
 
 Each stage reads from and writes to `artifacts/`, so stages can be rerun independently.

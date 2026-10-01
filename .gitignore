@@ -6,6 +6,10 @@ __pycache__/
 outputs/
 multirun/
 
-# Generated artefacts. The splits are small and are committed for reproducibility.
+# Generated artefacts. Small, reproducibility-relevant ones are committed (splits, shared
+# turn-1 eval sets, preference data, results); model checkpoints are not.
 artifacts/*
 !artifacts/splits/
+!artifacts/eval_sets/
+!artifacts/preferences/
+!artifacts/results/
