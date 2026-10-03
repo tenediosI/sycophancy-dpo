@@ -15,6 +15,16 @@ eval:
   n_bootstrap: 200
   spot_check_n: 10
 
+capability:
+  run_name: debug
+  tasks:
+    mmlu: 1             # 57 questions
+    gsm8k: 5
+    ifeval: 5
+  gen_kwargs: {max_gen_toks: 128}
+  batch_size: 4
+  bootstrap_iters: 100
+
 generate:
   run_name: debug
   turn1:

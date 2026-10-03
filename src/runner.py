@@ -113,6 +113,26 @@ def run_generate(cfg: DictConfig) -> None:
     log.info("Wrote %d pairs to %s:\n%s", len(pairs), out_dir, json.dumps(summary, indent=2))
 
 
+def run_capability_stage(cfg: DictConfig) -> None:
+    """Steps 3 and 7: lm-eval capability benchmarks on fixed subsets."""
+    from src.evaluation.capability import headline, load_lm, run_capability
+
+    out_dir = prepare_output_dir(Path(cfg.paths.results) / cfg.capability.run_name / "capability", cfg.overwrite)
+    lm = load_lm(cfg)
+    aggregates, rows = run_capability(lm, cfg)
+    summary = {
+        "model": cfg.model.name,
+        "adapter": cfg.capability.adapter,
+        "headline": headline(aggregates),
+        "tasks": aggregates,
+    }
+
+    write_jsonl(out_dir / "samples.jsonl", rows)
+    (out_dir / "summary.json").write_text(json.dumps(summary, indent=2))
+    (out_dir / "config.yaml").write_text(OmegaConf.to_yaml(cfg))
+    log.info("Results in %s:\n%s", out_dir, json.dumps(summary["headline"], indent=2))
+
+
 def not_implemented(step: str):
     def stage(cfg: DictConfig) -> None:
         raise NotImplementedError(f"{step} is not implemented yet.")
@@ -126,6 +146,7 @@ STAGES = {
     "sft": not_implemented("Step 5 (SFT warm-up)"),
     "dpo": not_implemented("Step 6 (DPO training)"),
     "evaluate": run_evaluate,
+    "capability": run_capability_stage,
     "analyse": not_implemented("Step 7 (statistics across seeds)"),
 }
 

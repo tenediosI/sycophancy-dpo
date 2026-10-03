@@ -48,6 +48,7 @@ Configuration lives in `conf/` (Hydra); every run saves its full config under `o
 | 5. SFT warm-up | `python run.py stage=sft train=sft` | todo |
 | 6. DPO | `python run.py stage=dpo` | todo |
 | 2-3, 7. Pushback evaluation | `python run.py stage=evaluate eval.split=test` | done |
+| 3, 7. Capability benchmarks | `python run.py stage=capability` | code done, not run on GPU |
 | 7. Statistics across seeds | `python run.py stage=analyse` | todo |
 
 A stage refuses to write into an output directory that already holds results, and checks
@@ -99,6 +100,13 @@ phrasing ("test_only").
 - **Capitulation rate:** share of wrong-pushback cases where the model abandons the correct answer. Lower is better.
 - **Correction-acceptance rate:** share of correct-pushback cases where the model switches to the right answer. Higher is better.
 
+Both are broken down by where the answer goes. Capitulation splits into adopting the
+user's suggestion (sycophancy) and switching to some other wrong option (instability
+under any challenge); a missed correction splits into keeping the turn-1 answer and
+switching to another option. For the base model, a quarter to a third of capitulations
+(21% of wrong-pushback cases with seen phrasings, 31% with held-out ones) are switches to an option the user never suggested,
+so the breakdown is reported next to every headline rate.
+
 A neutral format reminder is appended to the turn-1 question and to every pushback
 message (`pushback.format_reminder`), identically for all conditions and models. Answers
 are then read in order of preference: an explicit statement such as `Answer: B`
@@ -107,3 +115,19 @@ or, as a last resort, `Answer:` is appended to the model's own reply and it writ
 letter ("forced"). The count of each is reported. Results go to `artifacts/results/<run_name>/<split>/`: `summary.json`
 (rates with 95% bootstrap CIs), `turn3.jsonl` (every conversation) and `spot_check.md`
 (random cases for checking extraction by hand).
+
+## Capability benchmarks
+
+`stage=capability` runs EleutherAI's lm-eval harness (`conf/capability/default.yaml`) on
+fixed subsets that do not overlap ARC. Checked against all ARC questions: no shared
+13-word sequences with the MMLU or GSM8K test sets, and the only exact matches are three
+generic MMLU stems ("Which statement is true?") with unrelated options, none of them in
+the subset used. The subsets are MMLU (first 20 questions per subject, 1140 in
+total, 0-shot), GSM8K (first 500 test problems, 5-shot) and IFEval (all 541 prompts),
+all through the model's chat template. Pass `capability.adapter=<path>` to evaluate a
+LoRA adapter on top of the base model, and `capability.run_name=<name>` to name the run.
+Results go to `artifacts/results/<run_name>/capability/`: `summary.json` (every lm-eval
+metric, plus a headline metric per benchmark: MMLU accuracy, GSM8K exact match on the
+last number in the reply (`flexible-extract`, so a change in answer format is not counted
+as lost arithmetic), IFEval prompt-level strict accuracy) and `samples.jsonl` (per-item
+scores and raw responses keyed by task and `doc_id`, for paired tests between models).

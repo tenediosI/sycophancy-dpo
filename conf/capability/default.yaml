@@ -1,0 +1,17 @@
+# Capability-preservation benchmarks (Steps 3 and 7): python run.py stage=capability
+# None of these overlap ARC (the pushback data).
+run_name: base          # results go to artifacts/results/<run_name>/capability/
+adapter: null           # path to a LoRA adapter to load on top of model.name (trained models)
+
+# lm-eval task name -> fixed subset size: the first N documents (for MMLU, the first N
+# per subject, 57 subjects). null = the whole test set. Keep these identical for every
+# model so items pair up across models.
+tasks:
+  mmlu: 20              # 1140 questions, 0-shot, log-likelihood
+  gsm8k: 500            # of 1319, 5-shot, generation
+  ifeval: null          # all 541 prompts, generation
+
+apply_chat_template: true   # instruct model: prompts go through its chat template
+gen_kwargs: null            # override generation settings, e.g. {max_gen_toks: 128}
+batch_size: 16
+bootstrap_iters: 1000       # lm-eval's own stderr; our paired tests use the per-item scores

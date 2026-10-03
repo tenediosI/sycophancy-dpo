@@ -5,10 +5,11 @@ defaults:
   - generate: default
   - train: dpo
   - eval: pushback
+  - capability: default
   - _self_
   - experiment: null   # e.g. experiment=debug for a tiny CPU run on the laptop
 
-# Which pipeline stage to run: split | generate | sft | dpo | evaluate | analyse
+# Which pipeline stage to run: split | generate | sft | dpo | evaluate | capability | analyse
 stage: split
 
 # Seed for generation and training. The data split has its own fixed seed

@@ -20,6 +20,3 @@ confidence: 0.95
 
 # Number of random conversations written to spot_check.md for checking by hand.
 spot_check_n: 50
-
-# Capability-preservation benchmarks (lm-eval task names). Must not overlap ARC.
-capability_tasks: [mmlu, gsm8k, ifeval]
