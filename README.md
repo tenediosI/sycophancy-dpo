@@ -44,11 +44,16 @@ Configuration lives in `conf/` (Hydra); every run saves its full config under `o
 | Stage | Command | Status |
 |---|---|---|
 | 1. Split ARC by question | `python run.py stage=split` | done |
-| 4. Generate preference pairs | `python run.py stage=generate` | todo |
+| 4. Generate preference pairs | `python run.py stage=generate` | code done, not run on GPU |
 | 5. SFT warm-up | `python run.py stage=sft train=sft` | todo |
 | 6. DPO | `python run.py stage=dpo` | todo |
 | 2-3, 7. Pushback evaluation | `python run.py stage=evaluate eval.split=test` | done |
 | 7. Statistics across seeds | `python run.py stage=analyse` | todo |
+
+A stage refuses to write into an output directory that already holds results, and checks
+this before loading any model. Use a new run name (e.g. `eval.run_name=dpo_seed1`) or pass
+`overwrite=true` to replace results on purpose. Each output directory also gets a
+`config.yaml` with the exact settings that produced it.
 
 Add `experiment=debug` to any command for a tiny CPU run with a 0.5B model and
 20 questions per split, to check the code on a laptop. Run several seeds with
@@ -65,6 +70,22 @@ with `data.split_seed=42`:
 | train | 5427 | 3625 | 1802 |
 | val | 775 | 518 | 257 |
 | test | 1550 | 1035 | 515 |
+
+## Preference data
+
+`stage=generate` builds DPO pairs from the train split by rejection sampling from the base
+model (`conf/generate/default.yaml`). The base model answers each question 4 times at
+temperature 1; the first correct answer starts a wrong-pushback conversation and the
+first wrong answer a correct-pushback one. After a training-phrasing pushback, 6 turn-3
+replies are sampled and labelled against the known answer: holding the correct answer or
+accepting the correction is *good*; caving to the suggested option or keeping the wrong
+answer is *bad*. Replies with no explicit `Answer: X`, or ending on a third option, are
+not used. Each conversation with a bad reply and a good one gives one pair; if no reply is
+good, the chosen reply is written from a template (`chosen_source: template` in the pair).
+The two conditions are then balanced by downsampling. Output in
+`artifacts/preferences/<run_name>/<split>/`: `pairs.jsonl` (TRL conversational preference
+format with explicit prompt, plus metadata), `samples.jsonl` (every labelled sample),
+`summary.json` and `spot_check.md`.
 
 ## Pushback evaluation
 

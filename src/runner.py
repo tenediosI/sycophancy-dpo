@@ -11,7 +11,7 @@ from omegaconf import DictConfig, OmegaConf
 
 from src.data.loaders import load_arc
 from src.data.splitter import split_by_question
-from src.io_utils import read_jsonl, write_jsonl
+from src.io_utils import prepare_output_dir, read_jsonl, write_jsonl
 
 # Model-dependent imports (torch, transformers) happen inside the stages that need
 # them, so `stage=split` works without installing the ML stack.
@@ -58,6 +58,7 @@ def run_evaluate(cfg: DictConfig) -> None:
     from src.evaluation.pushback_eval import build_eval_set, run_pushback, spot_check_report, summarise
     from src.models.factory import load_model
 
+    out_dir = prepare_output_dir(Path(cfg.paths.results) / cfg.eval.run_name / cfg.eval.split, cfg.overwrite)
     records = load_split(cfg, cfg.eval.split)
     model, tokenizer = load_model(cfg.model)
 
@@ -76,13 +77,40 @@ def run_evaluate(cfg: DictConfig) -> None:
     summary = {"model": cfg.model.name, "split": cfg.eval.split, "eval_set": str(eval_set_path)}
     summary |= summarise(items, rows, cfg)
 
-    out_dir = Path(cfg.paths.results) / cfg.eval.run_name / cfg.eval.split
     write_jsonl(out_dir / "turn3.jsonl", rows)
     (out_dir / "summary.json").write_text(json.dumps(summary, indent=2))
     (out_dir / "spot_check.md").write_text(
         spot_check_report(items, rows, cfg.eval.spot_check_n, cfg.eval.eval_set_seed), encoding="utf-8"
     )
+    (out_dir / "config.yaml").write_text(OmegaConf.to_yaml(cfg))
     log.info("Results in %s:\n%s", out_dir, json.dumps(summary, indent=2))
+
+
+def run_generate(cfg: DictConfig) -> None:
+    """Step 4: preference pairs by rejection sampling from the base model."""
+    from transformers import set_seed
+
+    from src.data.preferences import build_preferences, spot_check_report
+    from src.models.factory import load_model
+
+    out_dir = prepare_output_dir(
+        Path(cfg.paths.preferences) / cfg.generate.run_name / cfg.generate.split, cfg.overwrite
+    )
+    records = load_split(cfg, cfg.generate.split)
+    set_seed(cfg.seed)
+    model, tokenizer = load_model(cfg.model)
+
+    pairs, samples, summary = build_preferences(records, model, tokenizer, cfg)
+    summary = {"model": cfg.model.name, "split": cfg.generate.split} | summary
+
+    write_jsonl(out_dir / "pairs.jsonl", pairs)
+    write_jsonl(out_dir / "samples.jsonl", samples)
+    (out_dir / "summary.json").write_text(json.dumps(summary, indent=2))
+    (out_dir / "spot_check.md").write_text(
+        spot_check_report(pairs, cfg.generate.spot_check_n, cfg.seed), encoding="utf-8"
+    )
+    (out_dir / "config.yaml").write_text(OmegaConf.to_yaml(cfg))
+    log.info("Wrote %d pairs to %s:\n%s", len(pairs), out_dir, json.dumps(summary, indent=2))
 
 
 def not_implemented(step: str):
@@ -94,7 +122,7 @@ def not_implemented(step: str):
 
 STAGES = {
     "split": run_split,
-    "generate": not_implemented("Step 4 (preference data generation)"),
+    "generate": run_generate,
     "sft": not_implemented("Step 5 (SFT warm-up)"),
     "dpo": not_implemented("Step 6 (DPO training)"),
     "evaluate": run_evaluate,

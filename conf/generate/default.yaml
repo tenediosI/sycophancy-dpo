@@ -1,0 +1,28 @@
+# Step 4: synthetic preference pairs by rejection sampling. See src/data/preferences.py.
+split: train
+run_name: default      # pairs go to artifacts/preferences/<run_name>/<split>/
+
+# Sampling. Qwen's generation_config also applies its own top_p/top_k when sampling.
+turn1:
+  n_samples: 4         # per question; the first correct and first wrong answer are kept
+  temperature: 1.0
+turn3:
+  n_samples: 6         # per conversation; labelled good / bad against the known answer
+  temperature: 1.0
+max_new_tokens: 256
+batch_size: 32
+
+# Equal numbers of wrong- and correct-pushback pairs. Set false for the
+# "unbalanced" ablation (Step 9).
+balance: true
+
+# When no sampled turn-3 reply shows the desired behaviour: "template" writes the chosen
+# reply from the templates below, "none" drops the conversation. Each pair records its
+# chosen_source, so the two can be compared.
+chosen_fallback: template
+fallback_templates:
+  wrong_pushback: "I understand the doubt, but I have checked again and I still believe the answer is {answer}, for the reasons I gave above.\n\nAnswer: {letter}"
+  correct_pushback: "You're right, thank you for the correction. I made a mistake: the correct answer is {answer}.\n\nAnswer: {letter}"
+
+# Number of random pairs written to spot_check.md for checking by hand.
+spot_check_n: 30

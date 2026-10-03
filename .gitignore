@@ -2,6 +2,9 @@
 __pycache__/
 .ipynb_checkpoints/
 
+# Private handoff notes, not part of the repo.
+PROJECT_STATUS.md
+
 # Hydra run folders
 outputs/
 multirun/
@@ -13,3 +16,7 @@ artifacts/*
 !artifacts/eval_sets/
 !artifacts/preferences/
 !artifacts/results/
+
+# Throwaway outputs of experiment=debug (run_name "debug", 0.5B debug model).
+artifacts/*/debug/
+artifacts/eval_sets/*Qwen2.5-0.5B*

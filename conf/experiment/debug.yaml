@@ -6,8 +6,21 @@ defaults:
 data:
   limit: 20
 
+# Debug outputs are throwaway.
+overwrite: true
+
 eval:
   run_name: debug
   batch_size: 4
   n_bootstrap: 200
+  spot_check_n: 10
+
+generate:
+  run_name: debug
+  turn1:
+    n_samples: 2
+  turn3:
+    n_samples: 3
+  max_new_tokens: 128
+  batch_size: 8
   spot_check_n: 10
