@@ -1,28 +1,41 @@
 #!/usr/bin/env bash
-# Full GPU session for Steps 4-7 on a Vast.ai instance, then push results and stop:
+# Full GPU session on a Vast.ai instance, then push results and stop:
 #
 #   bash scripts/gpu_session.sh 2>&1 | tee -a session.log
 #
-#   1. Regenerate preference pairs (train, val).
-#   2. Base model on val (reference for the sweep). Base test results already exist.
+#   1. (GENERATE=1 only) Regenerate preference pairs (train, val).
+#   2. Base model references on val, test and capability (skipped when they exist).
 #   3. DPO learning-rate sweep, seed 0, each evaluated on val.
 #   4. Pick the learning rate with scripts/pick_lr.py (rule fixed in advance, val only).
+#      If no rate qualifies, stop here.
 #   5. DPO with that rate for seeds 1-3, each evaluated on test (pushback + capability).
+#   6. Step 7 statistics against the base model (stage=analyse).
+#
+# The defaults are GPU session 3: balanced pairs (1 wrong-pushback pair per
+# correct-pushback pair) and the constrained rule. GPU session 2 was:
+#   GENERATE=1 RUN=dpo RATIO=3 RULE=gap LRS="5e-6 2e-5 5e-5"
 #
 # Results are committed and pushed after every phase, and once more on exit. The instance
-# is stopped on exit whether the session succeeds or fails.
+# is stopped on exit whether the session succeeds or fails. Rerunning the script skips
+# finished steps and redoes an interrupted one.
 #
-# Environment overrides (for a quick local test of the script itself):
-#   LRS="5e-6 2e-5 5e-5"   learning rates to sweep
-#   SEEDS="1 2 3"          final training seeds
-#   PREFIX=""              prefix for run names, e.g. "debug/" (debug dirs are gitignored)
-#   EXTRA=""               extra Hydra overrides for every run.py call, e.g. "experiment=debug"
-#   NO_PUSH=1              do not commit or push
-#   SKIP_GENERATE=1        skip step 1 (resume after the pairs were generated and pushed)
+# Environment overrides:
+#   RUN="dpo_bal"            run-name stem: <RUN>_lr<lr>_seed0 (sweep), <RUN>_seed<s> (final)
+#   RATIO=1                  train.pairs.wrong_per_correct
+#   RULE=constrained         pick_lr.py rule: constrained | gap
+#   LRS="2e-5 3e-5 4e-5 5e-5"  learning rates to sweep
+#   SEEDS="1 2 3"            final training seeds
+#   GENERATE=1               regenerate the preference pairs first
+#   PREFIX=""                prefix for run names, e.g. "debug/" (for local tests)
+#   EXTRA=""                 extra Hydra overrides for every run.py call, e.g. "experiment=debug"
+#   NO_PUSH=1                do not commit or push
 #   (the instance is only stopped when $CONTAINER_ID is set, i.e. on Vast)
 set -euo pipefail
 
-LRS=${LRS:-"5e-6 2e-5 5e-5"}
+RUN=${RUN:-"dpo_bal"}
+RATIO=${RATIO:-1}
+RULE=${RULE:-"constrained"}
+LRS=${LRS:-"2e-5 3e-5 4e-5 5e-5"}
 SEEDS=${SEEDS:-"1 2 3"}
 PREFIX=${PREFIX:-""}
 EXTRA=${EXTRA:-""}
@@ -57,13 +70,14 @@ finish() {
 }
 trap finish EXIT
 
-# 1. Preference pairs. overwrite: the pairs from run 1 used the old selection.
-# SKIP_GENERATE=1 resumes a session whose pairs were already generated and pushed.
-if [ -z "${SKIP_GENERATE:-}" ]; then
+say "Session: RUN=$RUN RATIO=$RATIO RULE=$RULE LRS=\"$LRS\" SEEDS=\"$SEEDS\""
+
+# 1. Preference pairs (overwrite: replaces the committed ones).
+if [ -n "${GENERATE:-}" ]; then
     for split in train val; do
         run stage=generate generate.split="$split" overwrite=true
     done
-    push "preference pairs (all pairs saved)"
+    push "preference pairs"
 fi
 
 # 2. Base model references (skipped when they already exist).
@@ -72,14 +86,15 @@ fi
 [ -f "artifacts/results/$BASE/capability/summary.json" ] || run stage=capability capability.run_name="$BASE"
 push "base model references"
 
-# Steps 3 and 5 are resumable: rerunning the script skips work whose output exists and
-# redoes (overwrite=true) a step that was interrupted half-way.
+# Steps 3 and 5 skip work whose output exists and redo (overwrite=true) a step that was
+# interrupted half-way.
 train_dpo() {  # name lr seed
     # The summary is written after the merged model is saved, so it marks a finished run;
     # the checkpoint must also still be on this disk (it is not pushed).
     [ -f "artifacts/results/$1/train/summary.json" ] && [ -d "artifacts/checkpoints/$1/merged" ] \
         && { say "skip training $1 (exists)"; return; }
-    run stage=dpo seed="$3" train.learning_rate="$2" train.run_name="$1" overwrite=true
+    run stage=dpo seed="$3" train.learning_rate="$2" train.run_name="$1" \
+        train.pairs.wrong_per_correct="$RATIO" overwrite=true
 }
 evaluate() {  # name split
     [ -f "artifacts/results/$1/$2/summary.json" ] && { say "skip $2 eval of $1 (exists)"; return; }
@@ -93,24 +108,35 @@ capability() {  # name
 # 3. Learning-rate sweep on val, seed 0.
 sweep=()
 for lr in $LRS; do
-    name="${PREFIX}dpo_lr${lr}_seed0"
+    name="${PREFIX}${RUN}_lr${lr}_seed0"
     train_dpo "$name" "$lr" 0
     evaluate "$name" val
     sweep+=("$lr=$name")
 done
 
 # 4. Choose the learning rate (last line of the output).
-best_lr=$(python scripts/pick_lr.py "$BASE" "${sweep[@]}" | tee /dev/stderr | tail -n 1)
+best_lr=$(python scripts/pick_lr.py --rule "$RULE" --out "$RUN" "$BASE" "${sweep[@]}" | tee /dev/stderr | tail -n 1)
 say "Chosen learning rate: $best_lr"
-push "DPO learning-rate sweep on val (chosen $best_lr)"
+push "$RUN learning-rate sweep on val (chosen $best_lr)"
+if [ "$best_lr" = "none" ]; then
+    say "No learning rate passed the selection rule; skipping the final seeds."
+    exit 0
+fi
 
 # 5. Final runs: fresh seeds, evaluated on test.
+finals=()
 for seed in $SEEDS; do
-    name="${PREFIX}dpo_seed${seed}"
+    name="${PREFIX}${RUN}_seed${seed}"
     train_dpo "$name" "$best_lr" "$seed"
     evaluate "$name" test
     capability "$name"
-    push "DPO seed $seed (lr $best_lr) on test"
+    finals+=("$name")
+    push "$name (lr $best_lr) on test"
 done
+
+# 6. Statistics against the base model.
+runs_list=$(IFS=,; echo "${finals[*]}")
+run stage=analyse analyse.name="${PREFIX}${RUN}" analyse.base_run="$BASE" "analyse.runs=[$runs_list]" overwrite=true
+push "$RUN analysis"
 
 say "All done."

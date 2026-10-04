@@ -19,4 +19,5 @@ artifacts/*
 
 # Throwaway outputs of experiment=debug (run_name "debug", 0.5B debug model).
 artifacts/*/debug/
+artifacts/results/analysis/debug/
 artifacts/eval_sets/*Qwen2.5-0.5B*

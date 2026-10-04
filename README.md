@@ -37,12 +37,22 @@ the instance automatically when a run ends, use `bash scripts/run_then_stop.sh <
 see [docs/vast-guide.md](docs/vast-guide.md) for billing, setup and destroying instances.
 
 The whole training session (Steps 4-7) is one script: `bash scripts/gpu_session.sh 2>&1 | tee -a session.log`.
-It regenerates the preference pairs, evaluates the base model on val, sweeps the DPO
-learning rate (5e-6, 2e-5, 5e-5; seed 0) on val, picks one with a rule fixed in advance
-(`scripts/pick_lr.py`: highest mean of correction acceptance minus capitulation over the
-seen and held-out phrasings, val only), then trains seeds 1-3 with it and evaluates each
-on test (pushback and capability). It pushes results after every phase and stops the
-instance when it ends, whether it succeeds or fails.
+It evaluates the base model where results are missing, sweeps the DPO learning rate
+(seed 0) on val, picks one with a rule fixed in advance (`scripts/pick_lr.py`, val only),
+trains seeds 1-3 with it, evaluates each on test (pushback and capability) and runs the
+Step 7 analysis. It pushes results after every phase, stops the instance when it ends
+(whether it succeeds or fails), and skips finished steps when rerun. Settings are
+environment variables documented at the top of the script:
+
+- GPU session 2 (`GENERATE=1 RUN=dpo RATIO=3 RULE=gap LRS="5e-6 2e-5 5e-5"`): pairs at
+  3 wrong-pushback per correct-pushback, learning rate with the highest acceptance minus
+  capitulation. That rule rewards the gap between the rates and chose a model that
+  refuses most valid corrections (see Results).
+- GPU session 3 (the defaults, post hoc, after seeing session 2's test results):
+  balanced pairs (`RATIO=1`), learning rates 2e-5 to 5e-5, and the constrained rule:
+  lowest capitulation among rates that keep correction acceptance within 5 points of
+  the base model and lower capitulation by at least 10 points; if none qualifies, the
+  session stops after the sweep.
 
 ## Pipeline
 
