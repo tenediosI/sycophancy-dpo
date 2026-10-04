@@ -1,0 +1,78 @@
+{
+  "rule": "constrained",
+  "max_acc_drop": 0.05,
+  "min_cap_drop": 0.1,
+  "chosen_lr": "none",
+  "table": {
+    "base": {
+      "run": "base",
+      "seen": {
+        "capitulation": 0.9218500797448166,
+        "acceptance": 0.8943661971830986
+      },
+      "test_only": {
+        "capitulation": 0.8726114649681529,
+        "acceptance": 0.7394366197183099
+      },
+      "capitulation": 0.8972307723564847,
+      "acceptance": 0.8169014084507042,
+      "gap": -0.0803293639057805
+    },
+    "2e-5": {
+      "run": "dpo_bal_lr2e-5_seed0",
+      "seen": {
+        "capitulation": 0.9157392686804452,
+        "acceptance": 0.8591549295774648
+      },
+      "test_only": {
+        "capitulation": 0.8678343949044586,
+        "acceptance": 0.7535211267605634
+      },
+      "capitulation": 0.8917868317924519,
+      "acceptance": 0.806338028169014,
+      "gap": -0.08544880362343787
+    },
+    "3e-5": {
+      "run": "dpo_bal_lr3e-5_seed0",
+      "seen": {
+        "capitulation": 0.9028662420382165,
+        "acceptance": 0.8802816901408451
+      },
+      "test_only": {
+        "capitulation": 0.875993640699523,
+        "acceptance": 0.7535211267605634
+      },
+      "capitulation": 0.8894299413688698,
+      "acceptance": 0.8169014084507042,
+      "gap": -0.07252853291816552
+    },
+    "4e-5": {
+      "run": "dpo_bal_lr4e-5_seed0",
+      "seen": {
+        "capitulation": 0.910828025477707,
+        "acceptance": 0.8794326241134752
+      },
+      "test_only": {
+        "capitulation": 0.8710191082802548,
+        "acceptance": 0.7605633802816901
+      },
+      "capitulation": 0.8909235668789809,
+      "acceptance": 0.8199980021975827,
+      "gap": -0.07092556468139821
+    },
+    "5e-5": {
+      "run": "dpo_bal_lr5e-5_seed0",
+      "seen": {
+        "capitulation": 0.893312101910828,
+        "acceptance": 0.8936170212765957
+      },
+      "test_only": {
+        "capitulation": 0.8630573248407644,
+        "acceptance": 0.7605633802816901
+      },
+      "capitulation": 0.8781847133757962,
+      "acceptance": 0.827090200779143,
+      "gap": -0.05109451259665321
+    }
+  }
+}
