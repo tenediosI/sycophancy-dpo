@@ -1,0 +1,128 @@
+{
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "checkpoint": "artifacts/checkpoints/dpo_seed2/merged",
+  "split": "test",
+  "eval_set": "artifacts/eval_sets/test_Qwen2.5-1.5B-Instruct_n1550.jsonl",
+  "n_questions": 1550,
+  "turn1_answer_sources": {
+    "stated": 1510,
+    "forced": 27,
+    "inferred": 4,
+    "unparseable": 9
+  },
+  "turn1_accuracy": 0.8387096774193549,
+  "n_wrong_pushback": 1300,
+  "n_correct_pushback": 241,
+  "seen": {
+    "capitulation_rate": {
+      "rate": 0.19476520400307928,
+      "ci": [
+        0.1724403387220939,
+        0.21632024634334104
+      ],
+      "n": 1299
+    },
+    "correction_acceptance_rate": {
+      "rate": 0.2625,
+      "ci": [
+        0.20833333333333334,
+        0.31666666666666665
+      ],
+      "n": 240
+    },
+    "adopted_suggestion_rate": {
+      "rate": 0.02771362586605081,
+      "ci": [
+        0.01924557351809084,
+        0.03695150115473441
+      ],
+      "n": 1299
+    },
+    "wrong_pushback_other_option_rate": {
+      "rate": 0.16705157813702848,
+      "ci": [
+        0.147036181678214,
+        0.1878367975365666
+      ],
+      "n": 1299
+    },
+    "kept_wrong_answer_rate": {
+      "rate": 0.3375,
+      "ci": [
+        0.2791666666666667,
+        0.3958333333333333
+      ],
+      "n": 240
+    },
+    "correct_pushback_other_option_rate": {
+      "rate": 0.4,
+      "ci": [
+        0.3416666666666667,
+        0.4625
+      ],
+      "n": 240
+    },
+    "turn3_answer_sources": {
+      "stated": 1501,
+      "inferred": 14,
+      "forced": 24,
+      "unparseable": 2
+    }
+  },
+  "test_only": {
+    "capitulation_rate": {
+      "rate": 0.23420647149460708,
+      "ci": [
+        0.21184514637904484,
+        0.2573189522342065
+      ],
+      "n": 1298
+    },
+    "correction_acceptance_rate": {
+      "rate": 0.2572614107883817,
+      "ci": [
+        0.2033195020746888,
+        0.3153526970954357
+      ],
+      "n": 241
+    },
+    "adopted_suggestion_rate": {
+      "rate": 0.029275808936825885,
+      "ci": [
+        0.020030816640986132,
+        0.03852080123266564
+      ],
+      "n": 1298
+    },
+    "wrong_pushback_other_option_rate": {
+      "rate": 0.2049306625577812,
+      "ci": [
+        0.18335901386748846,
+        0.22727272727272727
+      ],
+      "n": 1298
+    },
+    "kept_wrong_answer_rate": {
+      "rate": 0.38589211618257263,
+      "ci": [
+        0.3236514522821577,
+        0.44813278008298757
+      ],
+      "n": 241
+    },
+    "correct_pushback_other_option_rate": {
+      "rate": 0.35684647302904565,
+      "ci": [
+        0.2987551867219917,
+        0.4149377593360996
+      ],
+      "n": 241
+    },
+    "turn3_answer_sources": {
+      "stated": 1490,
+      "inferred": 12,
+      "forced": 37,
+      "unparseable": 2
+    }
+  }
+}
