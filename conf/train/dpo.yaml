@@ -7,3 +7,11 @@ num_train_epochs: 1
 per_device_train_batch_size: 4
 gradient_accumulation_steps: 4
 max_length: 1024
+
+# Which saved preference pairs to train on (src/data/preferences.py: select_pairs).
+# Correct-pushback pairs are rare and all kept; wrong-pushback pairs are capped at
+# wrong_per_correct per correct-pushback pair (null = all; 1 = balanced). Step 9 ablates it.
+pairs:
+  run_name: default            # artifacts/preferences/<run_name>/{train,val}/pairs.jsonl
+  wrong_per_correct: 3
+  prefer_sampled_chosen: true  # take pairs with a sampled chosen reply before templated ones

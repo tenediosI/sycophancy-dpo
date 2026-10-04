@@ -12,9 +12,8 @@ turn3:
 max_new_tokens: 256
 batch_size: 32
 
-# Equal numbers of wrong- and correct-pushback pairs. Set false for the
-# "unbalanced" ablation (Step 9).
-balance: true
+# Every pair is saved; which ones are trained on is chosen at training time
+# (train.pairs in conf/train/*.yaml).
 
 # When no sampled turn-3 reply shows the desired behaviour: "template" writes the chosen
 # reply from the templates below, "none" drops the conversation. Each pair records its

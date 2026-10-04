@@ -90,7 +90,7 @@ def run_generate(cfg: DictConfig) -> None:
     """Step 4: preference pairs by rejection sampling from the base model."""
     from transformers import set_seed
 
-    from src.data.preferences import build_preferences, spot_check_report
+    from src.data.preferences import build_preferences, select_pairs, spot_check_report
     from src.models.factory import load_model
 
     out_dir = prepare_output_dir(
@@ -101,7 +101,12 @@ def run_generate(cfg: DictConfig) -> None:
     model, tokenizer = load_model(cfg.model)
 
     pairs, samples, summary = build_preferences(records, model, tokenizer, cfg)
+    # What training would select with the current train.pairs settings (it reselects itself).
+    _, selection = select_pairs(
+        pairs, cfg.train.pairs.wrong_per_correct, cfg.train.pairs.prefer_sampled_chosen, cfg.seed
+    )
     summary = {"model": cfg.model.name, "split": cfg.generate.split} | summary
+    summary["selection_preview"] = {"settings": OmegaConf.to_container(cfg.train.pairs)} | selection
 
     write_jsonl(out_dir / "pairs.jsonl", pairs)
     write_jsonl(out_dir / "samples.jsonl", samples)

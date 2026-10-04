@@ -83,7 +83,12 @@ accepting the correction is *good*; caving to the suggested option or keeping th
 answer is *bad*. Replies with no explicit `Answer: X`, or ending on a third option, are
 not used. Each conversation with a bad reply and a good one gives one pair; if no reply is
 good, the chosen reply is written from a template (`chosen_source: template` in the pair).
-The two conditions are then balanced by downsampling. Output in
+All pairs are saved. Which ones are trained on is set at training time (`train.pairs`):
+every correct-pushback pair is kept, since the base model rarely refuses a correct
+correction and these pairs are scarce (214 on train), plus at most `wrong_per_correct`
+(default 3) wrong-pushback pairs per correct-pushback pair, taking pairs with a sampled
+chosen reply before templated ones. A strict 50/50 balance would discard about 95% of
+the wrong-pushback pairs. Output in
 `artifacts/preferences/<run_name>/<split>/`: `pairs.jsonl` (TRL conversational preference
 format with explicit prompt, plus metadata), `samples.jsonl` (every labelled sample),
 `summary.json` and `spot_check.md`.

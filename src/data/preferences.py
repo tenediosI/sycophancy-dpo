@@ -10,9 +10,11 @@
    Replies without an explicit "Answer: X", or ending on some other option, are not used.
 4. One (chosen, rejected) pair per conversation with at least one good and one bad reply.
    If no reply is good, the chosen reply may come from a template; each pair records
-   whether its chosen reply was sampled or templated.
-5. The two conditions are balanced by downsampling the larger one, so the model cannot
-   lower capitulation simply by learning to always disagree.
+   whether its chosen reply was sampled or templated. All pairs are saved.
+5. At training time, `select_pairs` keeps every correct-pushback pair (the rare ones) and
+   a capped number of wrong-pushback pairs per correct-pushback pair, preferring sampled
+   chosen replies over templated ones. Keeping both conditions stops the model from
+   lowering capitulation simply by learning to always disagree.
 
 Prompts use the same system prompt and format reminder as the evaluation.
 """
@@ -152,24 +154,46 @@ def build_pairs(items: list[dict], samples: list[list[dict]], cfg: DictConfig, r
     return pairs
 
 
-def balance(pairs: list[dict], rng: random.Random) -> list[dict]:
-    """Downsample so both conditions have the same number of pairs."""
+def select_pairs(
+    pairs: list[dict], wrong_per_correct: float | None, prefer_sampled_chosen: bool, seed: int
+) -> tuple[list[dict], dict]:
+    """Choose the training pairs from everything `generate` saved.
+
+    Keeps all correct-pushback pairs and at most `wrong_per_correct` wrong-pushback pairs
+    per correct-pushback pair (None keeps all). With `prefer_sampled_chosen`, wrong-pushback
+    pairs whose chosen reply was sampled are taken before templated ones, to limit how much
+    of the data shares the template wording. Returns (pairs, summary counts).
+    """
+    rng = random.Random(seed)
     by_condition = defaultdict(list)
     for pair in pairs:
         by_condition[pair["condition"]].append(pair)
-    n = min(len(by_condition[c]) for c in CONDITIONS)
-    kept = [pair for c in CONDITIONS for pair in rng.sample(by_condition[c], n)]
+    correct = by_condition[CORRECT_PUSHBACK]
+    wrong = by_condition[WRONG_PUSHBACK][:]
+    rng.shuffle(wrong)
+    if prefer_sampled_chosen:
+        wrong.sort(key=lambda p: p["chosen_source"] != "sampled")  # stable: random within each group
+    if wrong_per_correct is not None:
+        wrong = wrong[: round(wrong_per_correct * len(correct))]
+
+    kept = correct + wrong
     rng.shuffle(kept)
-    return kept
+    summary = {
+        "available": dict(Counter(p["condition"] for p in pairs)),
+        "selected": dict(Counter(p["condition"] for p in kept)),
+        "chosen_source": {
+            c: dict(Counter(p["chosen_source"] for p in kept if p["condition"] == c)) for c in CONDITIONS
+        },
+    }
+    return kept, summary
 
 
 def build_preferences(records: list[dict], model, tokenizer, cfg: DictConfig) -> tuple[list[dict], list[dict], dict]:
-    """Return (pairs, every labelled turn-3 sample, summary counts)."""
+    """Return (all pairs, every labelled turn-3 sample, summary counts)."""
     rng = random.Random(cfg.seed)
     items = sample_turn1(records, model, tokenizer, cfg, rng)
     samples = sample_turn3(items, model, tokenizer, cfg)
-    all_pairs = build_pairs(items, samples, cfg, rng)
-    pairs = balance(all_pairs, rng) if cfg.generate.balance else all_pairs
+    pairs = build_pairs(items, samples, cfg, rng)
 
     sample_rows = [
         {"id": item["id"], "condition": item["condition"], "suggested": item["suggested"], **s}
@@ -182,7 +206,6 @@ def build_preferences(records: list[dict], model, tokenizer, cfg: DictConfig) ->
         "turn3_labels": {
             c: dict(Counter(str(s["label"]) for s in sample_rows if s["condition"] == c)) for c in CONDITIONS
         },
-        "pairs_before_balancing": dict(Counter(p["condition"] for p in all_pairs)),
         "pairs": dict(Counter(p["condition"] for p in pairs)),
         "chosen_source": {
             c: dict(Counter(p["chosen_source"] for p in pairs if p["condition"] == c)) for c in CONDITIONS
@@ -192,14 +215,20 @@ def build_preferences(records: list[dict], model, tokenizer, cfg: DictConfig) ->
 
 
 def spot_check_report(pairs: list[dict], n: int, seed: int) -> str:
-    """Markdown page of random pairs for checking the labels by hand."""
+    """Markdown page of random pairs for checking the labels by hand, half from each
+    condition (correct-pushback pairs are rare and would otherwise barely appear)."""
     lines = [
         "# Preference pairs: spot check",
         "",
         "Check that each chosen reply really shows the desired behaviour and each rejected one the failure.",
         "",
     ]
-    for k, pair in enumerate(random.Random(seed).sample(pairs, min(n, len(pairs))), 1):
+    rng = random.Random(seed)
+    sample = []
+    for c in CONDITIONS:
+        group = [p for p in pairs if p["condition"] == c]
+        sample += rng.sample(group, min(n // 2, len(group)))
+    for k, pair in enumerate(sample, 1):
         lines += [
             f"## {k}. {pair['id']} ({pair['condition']}, chosen {pair['chosen_source']})",
             "",
