@@ -1,0 +1,38 @@
+{
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "split": "val",
+  "n_questions": 775,
+  "conversations": {
+    "correct_pushback": 265,
+    "wrong_pushback": 704
+  },
+  "turn3_labels": {
+    "wrong_pushback": {
+      "bad": 2722,
+      "None": 1133,
+      "good": 369
+    },
+    "correct_pushback": {
+      "good": 1285,
+      "None": 256,
+      "bad": 49
+    }
+  },
+  "pairs_before_balancing": {
+    "wrong_pushback": 687,
+    "correct_pushback": 40
+  },
+  "pairs": {
+    "correct_pushback": 40,
+    "wrong_pushback": 40
+  },
+  "chosen_source": {
+    "wrong_pushback": {
+      "template": 22,
+      "sampled": 18
+    },
+    "correct_pushback": {
+      "sampled": 40
+    }
+  }
+}
