@@ -11,19 +11,22 @@
 #   5. DPO with that rate for seeds 1-3, each evaluated on test (pushback + capability).
 #   6. Step 7 statistics against the base model (stage=analyse).
 #
-# The defaults are GPU session 3: balanced pairs (1 wrong-pushback pair per
-# correct-pushback pair) and the constrained rule. GPU session 2 was:
-#   GENERATE=1 RUN=dpo RATIO=3 RULE=gap LRS="5e-6 2e-5 5e-5"
+# The defaults are GPU session 4: balanced pairs (1 wrong-pushback pair per
+# correct-pushback pair), 3 epochs and the constrained rule. Earlier sessions:
+#   session 2: GENERATE=1 RUN=dpo RATIO=3 RULE=gap EPOCHS=1 LRS="5e-6 2e-5 5e-5"
+#   session 3: RUN=dpo_bal RATIO=1 RULE=constrained EPOCHS=1 LRS="2e-5 3e-5 4e-5 5e-5"
+#              (no rate qualified: 24 steps per run barely moved the model)
 #
 # Results are committed and pushed after every phase, and once more on exit. The instance
 # is stopped on exit whether the session succeeds or fails. Rerunning the script skips
 # finished steps and redoes an interrupted one.
 #
 # Environment overrides:
-#   RUN="dpo_bal"            run-name stem: <RUN>_lr<lr>_seed0 (sweep), <RUN>_seed<s> (final)
+#   RUN="dpo_bal_ep3"        run-name stem: <RUN>_lr<lr>_seed0 (sweep), <RUN>_seed<s> (final)
 #   RATIO=1                  train.pairs.wrong_per_correct
+#   EPOCHS=3                 train.num_train_epochs
 #   RULE=constrained         pick_lr.py rule: constrained | gap
-#   LRS="2e-5 3e-5 4e-5 5e-5"  learning rates to sweep
+#   LRS="2e-5 3e-5 5e-5 1e-4"  learning rates to sweep
 #   SEEDS="1 2 3"            final training seeds
 #   GENERATE=1               regenerate the preference pairs first
 #   PREFIX=""                prefix for run names, e.g. "debug/" (for local tests)
@@ -32,10 +35,11 @@
 #   (the instance is only stopped when $CONTAINER_ID is set, i.e. on Vast)
 set -euo pipefail
 
-RUN=${RUN:-"dpo_bal"}
+RUN=${RUN:-"dpo_bal_ep3"}
 RATIO=${RATIO:-1}
+EPOCHS=${EPOCHS:-3}
 RULE=${RULE:-"constrained"}
-LRS=${LRS:-"2e-5 3e-5 4e-5 5e-5"}
+LRS=${LRS:-"2e-5 3e-5 5e-5 1e-4"}
 SEEDS=${SEEDS:-"1 2 3"}
 PREFIX=${PREFIX:-""}
 EXTRA=${EXTRA:-""}
@@ -70,7 +74,7 @@ finish() {
 }
 trap finish EXIT
 
-say "Session: RUN=$RUN RATIO=$RATIO RULE=$RULE LRS=\"$LRS\" SEEDS=\"$SEEDS\""
+say "Session: RUN=$RUN RATIO=$RATIO EPOCHS=$EPOCHS RULE=$RULE LRS=\"$LRS\" SEEDS=\"$SEEDS\""
 
 # 1. Preference pairs (overwrite: replaces the committed ones).
 if [ -n "${GENERATE:-}" ]; then
@@ -94,7 +98,7 @@ train_dpo() {  # name lr seed
     [ -f "artifacts/results/$1/train/summary.json" ] && [ -d "artifacts/checkpoints/$1/merged" ] \
         && { say "skip training $1 (exists)"; return; }
     run stage=dpo seed="$3" train.learning_rate="$2" train.run_name="$1" \
-        train.pairs.wrong_per_correct="$RATIO" overwrite=true
+        train.pairs.wrong_per_correct="$RATIO" train.num_train_epochs="$EPOCHS" overwrite=true
 }
 evaluate() {  # name split
     [ -f "artifacts/results/$1/$2/summary.json" ] && { say "skip $2 eval of $1 (exists)"; return; }

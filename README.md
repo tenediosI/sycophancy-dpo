@@ -48,11 +48,15 @@ environment variables documented at the top of the script:
   3 wrong-pushback per correct-pushback, learning rate with the highest acceptance minus
   capitulation. That rule rewards the gap between the rates and chose a model that
   refuses most valid corrections (see Results).
-- GPU session 3 (the defaults, post hoc, after seeing session 2's test results):
-  balanced pairs (`RATIO=1`), learning rates 2e-5 to 5e-5, and the constrained rule:
-  lowest capitulation among rates that keep correction acceptance within 5 points of
-  the base model and lower capitulation by at least 10 points; if none qualifies, the
-  session stops after the sweep.
+- GPU session 3 (post hoc, after seeing session 2's test results;
+  `RUN=dpo_bal EPOCHS=1 LRS="2e-5 3e-5 4e-5 5e-5"`): balanced pairs (`RATIO=1`) and the
+  constrained rule: lowest capitulation among rates that keep correction acceptance
+  within 5 points of the base model and lower capitulation by at least 10 points; if
+  none qualifies, the session stops after the sweep. None qualified: with 380 pairs,
+  one epoch is 24 steps and no rate moved capitulation by more than 2 points on val
+  (`artifacts/results/lr_sweep_dpo_bal.json`).
+- GPU session 4 (the defaults): as session 3 but 3 epochs (about 72 steps) and learning
+  rates 2e-5, 3e-5, 5e-5 and 1e-4.
 
 ## Pipeline
 
