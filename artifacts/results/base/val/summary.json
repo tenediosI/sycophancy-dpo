@@ -1,0 +1,128 @@
+{
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "checkpoint": null,
+  "split": "val",
+  "eval_set": "artifacts/eval_sets/val_Qwen2.5-1.5B-Instruct_n775.jsonl",
+  "n_questions": 775,
+  "turn1_answer_sources": {
+    "unparseable": 3,
+    "stated": 754,
+    "forced": 17,
+    "inferred": 1
+  },
+  "turn1_accuracy": 0.8116129032258065,
+  "n_wrong_pushback": 629,
+  "n_correct_pushback": 143,
+  "seen": {
+    "capitulation_rate": {
+      "rate": 0.9218500797448166,
+      "ci": [
+        0.8995215311004785,
+        0.9425837320574163
+      ],
+      "n": 627
+    },
+    "correction_acceptance_rate": {
+      "rate": 0.8943661971830986,
+      "ci": [
+        0.8380281690140845,
+        0.9436619718309859
+      ],
+      "n": 142
+    },
+    "adopted_suggestion_rate": {
+      "rate": 0.7161084529505582,
+      "ci": [
+        0.6794258373205742,
+        0.7511961722488039
+      ],
+      "n": 627
+    },
+    "wrong_pushback_other_option_rate": {
+      "rate": 0.20574162679425836,
+      "ci": [
+        0.17384370015948963,
+        0.23763955342902712
+      ],
+      "n": 627
+    },
+    "kept_wrong_answer_rate": {
+      "rate": 0.014084507042253521,
+      "ci": [
+        0.0,
+        0.035211267605633804
+      ],
+      "n": 142
+    },
+    "correct_pushback_other_option_rate": {
+      "rate": 0.09154929577464789,
+      "ci": [
+        0.04929577464788732,
+        0.14084507042253522
+      ],
+      "n": 142
+    },
+    "turn3_answer_sources": {
+      "stated": 758,
+      "forced": 8,
+      "inferred": 3,
+      "unparseable": 3
+    }
+  },
+  "test_only": {
+    "capitulation_rate": {
+      "rate": 0.8726114649681529,
+      "ci": [
+        0.8455414012738853,
+        0.8980891719745223
+      ],
+      "n": 628
+    },
+    "correction_acceptance_rate": {
+      "rate": 0.7394366197183099,
+      "ci": [
+        0.6690140845070423,
+        0.8098591549295775
+      ],
+      "n": 142
+    },
+    "adopted_suggestion_rate": {
+      "rate": 0.5557324840764332,
+      "ci": [
+        0.517515923566879,
+        0.5939490445859873
+      ],
+      "n": 628
+    },
+    "wrong_pushback_other_option_rate": {
+      "rate": 0.31687898089171973,
+      "ci": [
+        0.2786624203821656,
+        0.3535031847133758
+      ],
+      "n": 628
+    },
+    "kept_wrong_answer_rate": {
+      "rate": 0.04225352112676056,
+      "ci": [
+        0.014084507042253521,
+        0.07746478873239436
+      ],
+      "n": 142
+    },
+    "correct_pushback_other_option_rate": {
+      "rate": 0.21830985915492956,
+      "ci": [
+        0.15492957746478872,
+        0.2887323943661972
+      ],
+      "n": 142
+    },
+    "turn3_answer_sources": {
+      "stated": 761,
+      "forced": 6,
+      "unparseable": 2,
+      "inferred": 3
+    }
+  }
+}
