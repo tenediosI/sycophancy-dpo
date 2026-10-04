@@ -168,11 +168,54 @@ def run_dpo_stage(cfg: DictConfig) -> None:
     run_dpo(cfg)
 
 
-def not_implemented(step: str):
-    def stage(cfg: DictConfig) -> None:
-        raise NotImplementedError(f"{step} is not implemented yet.")
+def run_analyse(cfg: DictConfig) -> None:
+    """Step 7: paired tests of each run against the base model, and across seeds."""
+    from src.results import stats
 
-    return stage
+    a = cfg.analyse
+    out_dir = prepare_output_dir(Path(cfg.paths.results) / "analysis" / a.name, cfg.overwrite)
+    results = Path(cfg.paths.results)
+
+    def outcomes(run: str) -> dict:
+        return stats.pushback_outcomes(read_jsonl(results / run / a.split / "turn3.jsonl")) | stats.capability_outcomes(
+            read_jsonl(results / run / "capability" / "samples.jsonl")
+        )
+
+    base = outcomes(a.base_run)
+    boot = dict(n_bootstrap=a.n_bootstrap, confidence=a.confidence)
+    per_run = {}
+    for run in a.runs:
+        model = outcomes(run)
+        per_run[run] = {
+            "metrics": {name: stats.compare(base[name], model[name], **boot) for name in base},
+            "discernment": {p: stats.discernment(base, model, p, **boot) for p in stats.PHRASINGS},
+        }
+
+    # Holm over every McNemar test in this analysis (metrics x runs).
+    adjusted = stats.holm({f"{run}|{name}": r["metrics"][name]["p"] for run, r in per_run.items() for name in base})
+    for key, p in adjusted.items():
+        run, name = key.split("|")
+        per_run[run]["metrics"][name] |= {"p_holm": p, "significant": p < a.alpha}
+
+    seeds = {
+        name: {
+            "model": stats.across_seeds([per_run[r]["metrics"][name]["model"] for r in a.runs]),
+            "diff": stats.across_seeds([per_run[r]["metrics"][name]["diff"] for r in a.runs]),
+        }
+        for name in base
+    } | {
+        f"discernment/{p}": {
+            "model": stats.across_seeds([per_run[r]["discernment"][p]["model"] for r in a.runs]),
+            "diff": stats.across_seeds([per_run[r]["discernment"][p]["diff"] for r in a.runs]),
+        }
+        for p in stats.PHRASINGS
+    }
+    summary = {"settings": OmegaConf.to_container(a), "runs": per_run, "across_seeds": seeds}
+    (out_dir / "summary.json").write_text(json.dumps(summary, indent=2))
+    (out_dir / "report.md").write_text(stats.report(summary, base_name=a.base_run), encoding="utf-8")
+    (out_dir / "config.yaml").write_text(OmegaConf.to_yaml(cfg))
+    log.info("Analysis in %s", out_dir)
+
 
 
 STAGES = {
@@ -182,7 +225,7 @@ STAGES = {
     "dpo": run_dpo_stage,
     "evaluate": run_evaluate,
     "capability": run_capability_stage,
-    "analyse": not_implemented("Step 7 (statistics across seeds)"),
+    "analyse": run_analyse,
 }
 
 

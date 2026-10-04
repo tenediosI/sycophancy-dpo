@@ -1,0 +1,9 @@
+# Step 7: python run.py stage=analyse
+# Compares each run with the base model, item by item, on the saved results.
+name: dpo_lr5e-5        # output: artifacts/results/analysis/<name>/
+base_run: base
+runs: [dpo_seed1, dpo_seed2, dpo_seed3]
+split: test             # pushback results compared (capability always uses its fixed subsets)
+n_bootstrap: 10000
+confidence: 0.95
+alpha: 0.05             # after Holm correction over every test in the analysis

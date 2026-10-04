@@ -6,6 +6,7 @@ defaults:
   - train: dpo
   - eval: pushback
   - capability: default
+  - analyse: default
   - _self_
   - experiment: null   # e.g. experiment=debug for a tiny CPU run on the laptop
 

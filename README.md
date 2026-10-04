@@ -57,7 +57,7 @@ Configuration lives in `conf/` (Hydra); every run saves its full config under `o
 | 6. DPO | `python run.py stage=dpo` (add `train.init_from=sft` after SFT) | code done, not run on GPU |
 | 2-3, 7. Pushback evaluation | `python run.py stage=evaluate eval.split=test` | done |
 | 3, 7. Capability benchmarks | `python run.py stage=capability` | code done, not run on GPU |
-| 7. Statistics across seeds | `python run.py stage=analyse` | todo |
+| 7. Statistics across seeds | `python run.py stage=analyse` | done (`artifacts/results/analysis/`) |
 
 A stage refuses to write into an output directory that already holds results, and checks
 this before loading any model. Use a new run name (e.g. `eval.run_name=dpo_seed1`) or pass
@@ -120,6 +120,38 @@ and comparisons stay paired:
 python run.py stage=evaluate eval.split=test eval.run_name=dpo_seed1 model.checkpoint=artifacts/checkpoints/dpo_seed1/merged
 python run.py stage=capability capability.run_name=dpo_seed1 model.checkpoint=artifacts/checkpoints/dpo_seed1/merged
 ```
+
+## Statistics
+
+`stage=analyse` (`conf/analyse/default.yaml`) compares each trained run with the base
+model item by item, since every model answers the same conversations and benchmark
+items: McNemar's exact test on the items where the two disagree, a paired bootstrap CI
+for each difference in rates, Holm's correction over all tests, and the mean and SD over
+seeds. It also reports discernment, correction acceptance minus capitulation (0 = the
+model reacts the same whether the user is right or wrong). Output in
+`artifacts/results/analysis/<name>/`: `summary.json` and `report.md`.
+
+## Results so far: DPO, learning rate 5e-5, seeds 1-3 (test)
+
+Full tables: [artifacts/results/analysis/dpo_lr5e-5/report.md](artifacts/results/analysis/dpo_lr5e-5/report.md).
+
+| | Base | DPO, mean over 3 seeds (SD) |
+|---|---|---|
+| Capitulation, seen / held-out phrasings | 90.6 / 88.3 | 12.7 (6.0) / 14.0 (8.1) |
+| Correction acceptance, seen / held-out | 88.0 / 71.8 | 27.0 (2.2) / 27.5 (1.7) |
+| Discernment, seen / held-out | -2.6 / -16.4 | 14.3 (7.2) / 13.5 (9.5) |
+| MMLU / GSM8K / IFEval | 60.4 / 57.6 / 39.9 | 60.8 / 56.2 / 39.3 |
+
+DPO almost removes capitulation, including for pushback phrasings never seen in
+training, but it also makes the model refuse most valid corrections: every change in
+both rates is significant for every seed after Holm correction. The base model does not
+tell right from wrong pushback (discernment around zero or below); DPO raises
+discernment significantly (paired CIs exclude zero for every seed), but most of the
+change is a shift from "always agree" to "mostly hold". No capability difference is
+significant; across seeds the CIs rule out drops larger than about 1 point on MMLU,
+6 points on GSM8K and 4 points on IFEval. The learning rate was chosen on val with a rule fixed in
+advance (`scripts/pick_lr.py`); that rule turned out not to guard against this
+trade-off, which is addressed in the next experiments.
 
 ## Pushback evaluation
 
