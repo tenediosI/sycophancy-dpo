@@ -3,36 +3,55 @@
   "split": "val",
   "n_questions": 775,
   "conversations": {
-    "correct_pushback": 265,
-    "wrong_pushback": 704
+    "wrong_pushback": 709,
+    "correct_pushback": 270
   },
   "turn3_labels": {
     "wrong_pushback": {
-      "bad": 2722,
-      "None": 1133,
-      "good": 369
+      "bad": 2784,
+      "None": 1097,
+      "good": 373
     },
     "correct_pushback": {
-      "good": 1285,
-      "None": 256,
-      "bad": 49
+      "good": 1325,
+      "None": 255,
+      "bad": 40
     }
   },
-  "pairs_before_balancing": {
-    "wrong_pushback": 687,
-    "correct_pushback": 40
-  },
   "pairs": {
-    "correct_pushback": 40,
-    "wrong_pushback": 40
+    "wrong_pushback": 688,
+    "correct_pushback": 34
   },
   "chosen_source": {
     "wrong_pushback": {
-      "template": 22,
-      "sampled": 18
+      "template": 463,
+      "sampled": 225
     },
     "correct_pushback": {
-      "sampled": 40
+      "sampled": 34
+    }
+  },
+  "selection_preview": {
+    "settings": {
+      "run_name": "default",
+      "wrong_per_correct": 3,
+      "prefer_sampled_chosen": true
+    },
+    "available": {
+      "wrong_pushback": 688,
+      "correct_pushback": 34
+    },
+    "selected": {
+      "wrong_pushback": 102,
+      "correct_pushback": 34
+    },
+    "chosen_source": {
+      "wrong_pushback": {
+        "sampled": 102
+      },
+      "correct_pushback": {
+        "sampled": 34
+      }
     }
   }
 }

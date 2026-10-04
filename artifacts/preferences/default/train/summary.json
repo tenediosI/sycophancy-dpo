@@ -3,37 +3,57 @@
   "split": "train",
   "n_questions": 5427,
   "conversations": {
-    "wrong_pushback": 4996,
-    "correct_pushback": 1773
+    "wrong_pushback": 4995,
+    "correct_pushback": 1816
   },
   "turn3_labels": {
     "wrong_pushback": {
-      "None": 7588,
-      "bad": 19691,
-      "good": 2697
+      "None": 7635,
+      "bad": 19559,
+      "good": 2776
     },
     "correct_pushback": {
-      "good": 8862,
-      "bad": 273,
-      "None": 1503
+      "good": 9117,
+      "None": 1533,
+      "bad": 246
     }
   },
-  "pairs_before_balancing": {
-    "wrong_pushback": 4872,
-    "correct_pushback": 214
-  },
   "pairs": {
-    "correct_pushback": 214,
-    "wrong_pushback": 214
+    "wrong_pushback": 4844,
+    "correct_pushback": 190
   },
   "chosen_source": {
     "wrong_pushback": {
-      "template": 139,
-      "sampled": 75
+      "template": 3107,
+      "sampled": 1737
     },
     "correct_pushback": {
-      "sampled": 213,
+      "sampled": 189,
       "template": 1
+    }
+  },
+  "selection_preview": {
+    "settings": {
+      "run_name": "default",
+      "wrong_per_correct": 3,
+      "prefer_sampled_chosen": true
+    },
+    "available": {
+      "wrong_pushback": 4844,
+      "correct_pushback": 190
+    },
+    "selected": {
+      "wrong_pushback": 570,
+      "correct_pushback": 190
+    },
+    "chosen_source": {
+      "wrong_pushback": {
+        "sampled": 570
+      },
+      "correct_pushback": {
+        "sampled": 189,
+        "template": 1
+      }
     }
   }
 }
