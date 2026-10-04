@@ -60,11 +60,17 @@ def run_evaluate(cfg: DictConfig) -> None:
 
     out_dir = prepare_output_dir(Path(cfg.paths.results) / cfg.eval.run_name / cfg.eval.split, cfg.overwrite)
     records = load_split(cfg, cfg.eval.split)
-    model, tokenizer = load_model(cfg.model)
 
-    # Turn 1 comes from the base model and is shared by every model evaluated later.
+    # Turn 1 comes from the base model and is shared by every model evaluated later, so
+    # the eval set is named after model.name (the base), never after a checkpoint.
     model_slug = cfg.model.name.split("/")[-1]
     eval_set_path = Path(cfg.paths.eval_sets) / f"{cfg.eval.split}_{model_slug}_n{len(records)}.jsonl"
+    if cfg.model.checkpoint and not eval_set_path.exists():
+        raise FileNotFoundError(
+            f"{eval_set_path} not found. Evaluate the base model first: a fine-tuned checkpoint "
+            "must reuse the base model's turn 1, or comparisons are no longer paired."
+        )
+    model, tokenizer = load_model(cfg.model)
     if eval_set_path.exists():
         items = read_jsonl(eval_set_path)
         log.info("Reusing eval set %s", eval_set_path)
@@ -74,7 +80,12 @@ def run_evaluate(cfg: DictConfig) -> None:
         log.info("Wrote eval set %s", eval_set_path)
 
     rows = run_pushback(items, model, tokenizer, cfg)
-    summary = {"model": cfg.model.name, "split": cfg.eval.split, "eval_set": str(eval_set_path)}
+    summary = {
+        "model": cfg.model.name,
+        "checkpoint": cfg.model.checkpoint,
+        "split": cfg.eval.split,
+        "eval_set": str(eval_set_path),
+    }
     summary |= summarise(items, rows, cfg)
 
     write_jsonl(out_dir / "turn3.jsonl", rows)
@@ -127,6 +138,7 @@ def run_capability_stage(cfg: DictConfig) -> None:
     aggregates, rows = run_capability(lm, cfg)
     summary = {
         "model": cfg.model.name,
+        "checkpoint": cfg.model.checkpoint,
         "adapter": cfg.capability.adapter,
         "headline": headline(aggregates),
         "tasks": aggregates,
@@ -136,6 +148,24 @@ def run_capability_stage(cfg: DictConfig) -> None:
     (out_dir / "summary.json").write_text(json.dumps(summary, indent=2))
     (out_dir / "config.yaml").write_text(OmegaConf.to_yaml(cfg))
     log.info("Results in %s:\n%s", out_dir, json.dumps(summary["headline"], indent=2))
+
+
+def run_sft_stage(cfg: DictConfig) -> None:
+    """Step 5: SFT warm-up (python run.py stage=sft train=sft)."""
+    if cfg.train.method != "sft":
+        raise ValueError("stage=sft needs train=sft.")
+    from src.training.sft import run_sft
+
+    run_sft(cfg)
+
+
+def run_dpo_stage(cfg: DictConfig) -> None:
+    """Step 6: DPO."""
+    if cfg.train.method != "dpo":
+        raise ValueError("stage=dpo needs train=dpo (the default).")
+    from src.training.dpo import run_dpo
+
+    run_dpo(cfg)
 
 
 def not_implemented(step: str):
@@ -148,8 +178,8 @@ def not_implemented(step: str):
 STAGES = {
     "split": run_split,
     "generate": run_generate,
-    "sft": not_implemented("Step 5 (SFT warm-up)"),
-    "dpo": not_implemented("Step 6 (DPO training)"),
+    "sft": run_sft_stage,
+    "dpo": run_dpo_stage,
     "evaluate": run_evaluate,
     "capability": run_capability_stage,
     "analyse": not_implemented("Step 7 (statistics across seeds)"),

@@ -14,7 +14,8 @@ numpy==2.5.3
 lm-eval[ifeval]==0.4.13
 peft==0.21.2
 
-# Steps 5-7: pin exact versions when each step is implemented, after checking the current TRL API.
-# trl
-# bitsandbytes
+# Steps 5-6 (SFT and DPO with LoRA; uses peft above)
+trl==1.14.1
+
+# Step 7: pin when implemented.
 # scipy

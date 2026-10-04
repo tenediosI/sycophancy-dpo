@@ -20,9 +20,11 @@ def load_lm(cfg: DictConfig):
     """Wrap the configured model (plus an optional LoRA adapter) for lm-eval."""
     from lm_eval.models.huggingface import HFLM
 
+    from src.models.factory import weights_path
+
     device = "cpu" if cfg.model.device_map == "cpu" else "cuda"
     return HFLM(
-        pretrained=cfg.model.name,
+        pretrained=weights_path(cfg.model),
         peft=cfg.capability.adapter,
         dtype=cfg.model.dtype,
         device=device,

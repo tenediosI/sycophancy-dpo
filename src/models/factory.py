@@ -9,16 +9,22 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 log = logging.getLogger(__name__)
 
 
+def weights_path(model_cfg: DictConfig) -> str:
+    """Where to load weights from: a fine-tuned checkpoint of model.name, or model.name itself."""
+    return model_cfg.checkpoint or model_cfg.name
+
+
 def load_model(model_cfg: DictConfig):
     """Return (model, tokenizer) for the configured model, ready for batched generation."""
-    tokenizer = AutoTokenizer.from_pretrained(model_cfg.name, padding_side="left")
+    path = weights_path(model_cfg)
+    tokenizer = AutoTokenizer.from_pretrained(path, padding_side="left")
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
     model = AutoModelForCausalLM.from_pretrained(
-        model_cfg.name, dtype=getattr(torch, model_cfg.dtype), device_map=model_cfg.device_map
+        path, dtype=getattr(torch, model_cfg.dtype), device_map=model_cfg.device_map
     )
     model.eval()
-    log.info("Loaded %s on %s", model_cfg.name, model.device)
+    log.info("Loaded %s on %s", path, model.device)
     return model, tokenizer
 
 

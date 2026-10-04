@@ -45,8 +45,8 @@ Configuration lives in `conf/` (Hydra); every run saves its full config under `o
 |---|---|---|
 | 1. Split ARC by question | `python run.py stage=split` | done |
 | 4. Generate preference pairs | `python run.py stage=generate` | code done, not run on GPU |
-| 5. SFT warm-up | `python run.py stage=sft train=sft` | todo |
-| 6. DPO | `python run.py stage=dpo` | todo |
+| 5. SFT warm-up | `python run.py stage=sft train=sft` | code done, not run on GPU |
+| 6. DPO | `python run.py stage=dpo` (add `train.init_from=sft` after SFT) | code done, not run on GPU |
 | 2-3, 7. Pushback evaluation | `python run.py stage=evaluate eval.split=test` | done |
 | 3, 7. Capability benchmarks | `python run.py stage=capability` | code done, not run on GPU |
 | 7. Statistics across seeds | `python run.py stage=analyse` | todo |
@@ -92,6 +92,26 @@ the wrong-pushback pairs. Output in
 `artifacts/preferences/<run_name>/<split>/`: `pairs.jsonl` (TRL conversational preference
 format with explicit prompt, plus metadata), `samples.jsonl` (every labelled sample),
 `summary.json` and `spot_check.md`.
+
+## Training (SFT and DPO)
+
+Both use LoRA (`conf/model/*.yaml`) with TRL and train on the pairs selected by
+`train.pairs`. SFT trains on the chosen replies only (the loss covers just the turn-3
+reply). DPO uses the model with its LoRA adapter disabled as the reference, so the
+reference is whatever training started from: the base model, or with
+`train.init_from=sft` the merged SFT model. Each run writes its adapter and a merged
+model to `artifacts/checkpoints/<run_name>/` (not committed) and its training log, pair
+selection and config to `artifacts/results/<run_name>/train/`. Run names default to
+`sft_seed<seed>` and `dpo_seed<seed>`.
+
+To evaluate a trained model, keep `model` as the base model and point
+`model.checkpoint` at the merged weights, so the base model's turn-1 eval set is reused
+and comparisons stay paired:
+
+```bash
+python run.py stage=evaluate eval.split=test eval.run_name=dpo_seed1 model.checkpoint=artifacts/checkpoints/dpo_seed1/merged
+python run.py stage=capability capability.run_name=dpo_seed1 model.checkpoint=artifacts/checkpoints/dpo_seed1/merged
+```
 
 ## Pushback evaluation
 

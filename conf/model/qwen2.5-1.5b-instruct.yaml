@@ -1,5 +1,8 @@
 # Main model for GPU runs. Apache-2.0 licence.
 name: Qwen/Qwen2.5-1.5B-Instruct
+# Local fine-tuned weights to load instead (e.g. artifacts/checkpoints/dpo_seed1/merged).
+# model.name stays the base model, so evaluation reuses the base model's turn-1 eval set.
+checkpoint: null
 dtype: bfloat16
 device_map: auto
 

@@ -1,16 +1,25 @@
+# Step 6: python run.py stage=dpo   (LoRA settings come from conf/model/*.yaml)
 # Starting points from the project guide. Tune on validation, never on test.
 method: dpo
-init_from: base        # base | sft (start from the SFT checkpoint)
+run_name: dpo_seed${seed}   # checkpoints/<run_name>/ and results/<run_name>/train/
+init_from: base             # base | sft (start from the merged SFT model of sft_run_name)
+sft_run_name: sft_seed${seed}
 beta: 0.1
 learning_rate: 5.0e-6
 num_train_epochs: 1
 per_device_train_batch_size: 4
 gradient_accumulation_steps: 4
+lr_scheduler_type: cosine
+warmup_steps: 0.1           # fraction of total steps
 max_length: 1024
+logging_steps: 5
+eval_steps: 0.25            # evaluate on val pairs 4 times per run (fraction of total steps)
+max_pairs: null             # cap on pairs used (debug runs only)
 
 # Which saved preference pairs to train on (src/data/preferences.py: select_pairs).
 # Correct-pushback pairs are rare and all kept; wrong-pushback pairs are capped at
 # wrong_per_correct per correct-pushback pair (null = all; 1 = balanced). Step 9 ablates it.
+# The selection uses `seed`, so each training seed sees its own subsample.
 pairs:
   run_name: default            # artifacts/preferences/<run_name>/{train,val}/pairs.jsonl
   wrong_per_correct: 3

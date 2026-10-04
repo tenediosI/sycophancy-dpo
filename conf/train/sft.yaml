@@ -1,10 +1,17 @@
-# Optional warm-up on the chosen responses only.
+# Step 5 (optional warm-up): python run.py stage=sft train=sft
+# LoRA on the chosen replies only (loss on the assistant's turn-3 reply).
 method: sft
+run_name: sft_seed${seed}
 learning_rate: 2.0e-4
 num_train_epochs: 1
 per_device_train_batch_size: 4
 gradient_accumulation_steps: 4
+lr_scheduler_type: cosine
+warmup_steps: 0.1           # fraction of total steps
 max_length: 1024
+logging_steps: 5
+eval_steps: 0.25
+max_pairs: null
 
 # Same pair selection as DPO (see conf/train/dpo.yaml); SFT trains on the chosen replies.
 pairs:

@@ -15,6 +15,17 @@ eval:
   n_bootstrap: 200
   spot_check_n: 10
 
+# Trains the 0.5B model for a few steps on 16 of the committed 1.5B pairs (the 0.5B
+# debug generate run yields no correct-pushback pairs).
+train:
+  run_name: debug/${train.method}
+  sft_run_name: debug/sft
+  max_pairs: 16
+  per_device_train_batch_size: 2
+  gradient_accumulation_steps: 2
+  max_length: 512
+  logging_steps: 1
+
 capability:
   run_name: debug
   tasks:

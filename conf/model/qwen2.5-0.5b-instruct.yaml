@@ -1,5 +1,8 @@
 # Tiny model for debugging the pipeline on a laptop CPU. Results are not meaningful.
 name: Qwen/Qwen2.5-0.5B-Instruct
+# Local fine-tuned weights to load instead (e.g. artifacts/checkpoints/dpo_seed1/merged).
+# model.name stays the base model, so evaluation reuses the base model's turn-1 eval set.
+checkpoint: null
 dtype: float32
 device_map: cpu
 
