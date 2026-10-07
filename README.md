@@ -56,7 +56,13 @@ environment variables documented at the top of the script:
   one epoch is 24 steps and no rate moved capitulation by more than 2 points on val
   (`artifacts/results/lr_sweep_dpo_bal.json`).
 - GPU session 4 (the defaults): as session 3 but 3 epochs (about 72 steps) and learning
-  rates 2e-5, 3e-5, 5e-5 and 1e-4.
+  rates 2e-5, 3e-5, 5e-5 and 1e-4. None qualified, but the trade-off is much better than
+  with 3:1 pairs (val, `artifacts/results/lr_sweep_dpo_bal_ep3.json`): at 1e-4
+  capitulation 18% with acceptance 67% (session 2's model: 14% and 31%); at 5e-5 44% and
+  74% (base: 90% and 82%).
+- GPU session 5 (`LR="5e-5 1e-4"`, post hoc): both of those points chosen by hand from
+  session 4's val sweep, 3 seeds each on test, analysed separately
+  (`artifacts/results/analysis/dpo_bal_ep3_lr<lr>/`). `LR` skips the sweep.
 
 ## Pipeline
 
