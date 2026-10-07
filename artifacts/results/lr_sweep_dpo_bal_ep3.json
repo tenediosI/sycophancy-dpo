@@ -1,0 +1,78 @@
+{
+  "rule": "constrained",
+  "max_acc_drop": 0.05,
+  "min_cap_drop": 0.1,
+  "chosen_lr": "none",
+  "table": {
+    "base": {
+      "run": "base",
+      "seen": {
+        "capitulation": 0.9218500797448166,
+        "acceptance": 0.8943661971830986
+      },
+      "test_only": {
+        "capitulation": 0.8726114649681529,
+        "acceptance": 0.7394366197183099
+      },
+      "capitulation": 0.8972307723564847,
+      "acceptance": 0.8169014084507042,
+      "gap": -0.0803293639057805
+    },
+    "2e-5": {
+      "run": "dpo_bal_ep3_lr2e-5_seed0",
+      "seen": {
+        "capitulation": 0.8426073131955485,
+        "acceptance": 0.8098591549295775
+      },
+      "test_only": {
+        "capitulation": 0.8407643312101911,
+        "acceptance": 0.7394366197183099
+      },
+      "capitulation": 0.8416858222028698,
+      "acceptance": 0.7746478873239437,
+      "gap": -0.06703793487892606
+    },
+    "3e-5": {
+      "run": "dpo_bal_ep3_lr3e-5_seed0",
+      "seen": {
+        "capitulation": 0.7484076433121019,
+        "acceptance": 0.7412587412587412
+      },
+      "test_only": {
+        "capitulation": 0.7818471337579618,
+        "acceptance": 0.7342657342657343
+      },
+      "capitulation": 0.7651273885350318,
+      "acceptance": 0.7377622377622377,
+      "gap": -0.02736515077279411
+    },
+    "5e-5": {
+      "run": "dpo_bal_ep3_lr5e-5_seed0",
+      "seen": {
+        "capitulation": 0.4069952305246423,
+        "acceptance": 0.7202797202797203
+      },
+      "test_only": {
+        "capitulation": 0.48171701112877585,
+        "acceptance": 0.7552447552447552
+      },
+      "capitulation": 0.44435612082670906,
+      "acceptance": 0.7377622377622377,
+      "gap": 0.29340611693552865
+    },
+    "1e-4": {
+      "run": "dpo_bal_ep3_lr1e-4_seed0",
+      "seen": {
+        "capitulation": 0.18441971383147854,
+        "acceptance": 0.6853146853146853
+      },
+      "test_only": {
+        "capitulation": 0.17488076311605724,
+        "acceptance": 0.6503496503496503
+      },
+      "capitulation": 0.17965023847376788,
+      "acceptance": 0.6678321678321678,
+      "gap": 0.48818192935839994
+    }
+  }
+}
