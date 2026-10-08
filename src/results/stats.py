@@ -101,6 +101,28 @@ def discernment(base: dict[str, dict], model: dict[str, dict], phrasing: str, n_
     }
 
 
+def pooled(base: dict, models: list[dict], n_bootstrap: int, confidence: float, seed: int = 0) -> dict:
+    """Seeds pooled: each item's score averaged over the trained runs, minus the base score.
+
+    Items are the unit (the seeds are repeated measurements of the same item), so the CI
+    resamples items and the p-value is a sign-flip permutation test on the per-item
+    differences (two-sided). More powerful than per-seed tests for small, consistent effects.
+    """
+    keys = sorted(base.keys() & set.intersection(*(set(m) for m in models)))
+    b = np.array([base[k] for k in keys], dtype=float)
+    m = np.array([[run[k] for k in keys] for run in models], dtype=float).mean(axis=0)
+    d = m - b
+    rng = np.random.default_rng(seed)
+    idx = rng.integers(0, len(d), size=(n_bootstrap, len(d)))
+    alpha = (1 - confidence) / 2
+    ci = [float(x) for x in np.quantile(d[idx].mean(axis=1), [alpha, 1 - alpha])]
+    signs = rng.choice([-1.0, 1.0], size=(n_bootstrap, len(d)))
+    null = np.abs((signs * d).mean(axis=1))
+    p = (1 + int((null >= abs(d.mean())).sum())) / (n_bootstrap + 1)
+    return {"n": len(keys), "n_runs": len(models), "base": float(b.mean()), "model": float(m.mean()),
+            "diff": float(d.mean()), "diff_ci": ci, "p": float(p)}
+
+
 def holm(pvalues: dict[str, float]) -> dict[str, float]:
     """Holm-adjusted p-values (family-wise error control), same keys as the input."""
     order = sorted(pvalues, key=pvalues.get)
@@ -142,6 +164,23 @@ def report(summary: dict, base_name: str) -> str:
         for p, d in r["discernment"].items():
             lines.append(
                 f"| {run} | {p} | {pct(d['base'])} | {pct(d['model'])} | {pct(d['diff'])} [{pct(d['diff_ci'][0])}, {pct(d['diff_ci'][1])}] |"
+            )
+    if "pooled" in summary:
+        lines += [
+            "",
+            "## Seeds pooled per item",
+            "",
+            "Each item's score averaged over the runs, minus the base score; CI resamples items; "
+            "p = sign-flip permutation test on the per-item differences; p_holm over these tests.",
+            "",
+            "| metric | n | base | runs | diff [CI] | p | p_holm |",
+            "|---|---|---|---|---|---|---|",
+        ]
+        for name, m in summary["pooled"].items():
+            lines.append(
+                f"| {name} | {m['n']} | {pct(m['base'])} | {pct(m['model'])} | "
+                f"{pct(m['diff'])} [{pct(m['diff_ci'][0])}, {pct(m['diff_ci'][1])}] | "
+                f"{m['p']:.2g} | {m['p_holm']:.2g}{' *' if m['significant'] else ''} |"
             )
     lines += ["", "## Across seeds (mean, SD, range)", "", "| metric | run mean (SD) | diff mean (SD) | diff range |", "|---|---|---|---|"]
     for name, a in summary["across_seeds"].items():

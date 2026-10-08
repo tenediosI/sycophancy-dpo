@@ -19,3 +19,6 @@ trl==1.14.1
 
 # Step 7 (McNemar exact test; already pulled in by lm-eval)
 scipy==1.18.1
+
+# Step 10 (figures)
+matplotlib==3.11.2

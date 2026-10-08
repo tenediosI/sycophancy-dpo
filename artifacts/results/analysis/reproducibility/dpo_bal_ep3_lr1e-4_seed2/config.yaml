@@ -103,12 +103,10 @@ capability:
   batch_size: 16
   bootstrap_iters: 1000
 analyse:
-  name: dpo_bal_ep3_lr1e-4
-  base_run: base
+  name: reproducibility/dpo_bal_ep3_lr1e-4_seed2
+  base_run: dpo_bal_ep3_lr1e-4_seed2
   runs:
-  - dpo_bal_ep3_lr1e-4_seed1
-  - dpo_bal_ep3_lr1e-4_seed2
-  - dpo_bal_ep3_lr1e-4_seed3
+  - dpo_bal_ep3_lr1e-4_seed2_rerun
   split: test
   n_bootstrap: 10000
   confidence: 0.95

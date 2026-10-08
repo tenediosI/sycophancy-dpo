@@ -69,6 +69,20 @@ Each run is compared with `base` on the same items (test split for pushback). Di
 | dpo_bal_ep3_lr1e-4_seed3 | seen | -2.6 | 55.9 | 58.5 [51.2, 65.8] |
 | dpo_bal_ep3_lr1e-4_seed3 | test_only | -16.4 | 50.8 | 67.2 [59.4, 74.9] |
 
+## Seeds pooled per item
+
+Each item's score averaged over the runs, minus the base score; CI resamples items; p = sign-flip permutation test on the per-item differences; p_holm over these tests.
+
+| metric | n | base | runs | diff [CI] | p | p_holm |
+|---|---|---|---|---|---|---|
+| capitulation/seen | 1298 | 90.6 | 18.8 | -71.8 [-74.1, -69.5] | 0.0001 | 0.0007 * |
+| acceptance/seen | 241 | 88.0 | 73.6 | -14.4 [-20.3, -8.3] | 0.0001 | 0.0007 * |
+| capitulation/test_only | 1298 | 88.3 | 18.0 | -70.3 [-72.7, -67.8] | 0.0001 | 0.0007 * |
+| acceptance/test_only | 238 | 71.8 | 69.5 | -2.4 [-8.8, 4.2] | 0.45 | 1 |
+| mmlu | 1140 | 60.4 | 60.4 | 0.0 [-1.3, 1.4] | 1 | 1 |
+| gsm8k | 500 | 57.6 | 54.5 | -3.1 [-6.1, -0.2] | 0.04 | 0.16 |
+| ifeval | 541 | 39.9 | 38.9 | -1.0 [-3.7, 1.5] | 0.41 | 1 |
+
 ## Across seeds (mean, SD, range)
 
 | metric | run mean (SD) | diff mean (SD) | diff range |

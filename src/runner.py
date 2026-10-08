@@ -247,7 +247,13 @@ def run_analyse(cfg: DictConfig) -> None:
         }
         for p in stats.PHRASINGS
     }
-    summary = {"settings": OmegaConf.to_container(a), "runs": per_run, "across_seeds": seeds}
+    # Seeds pooled per item, with its own Holm family (one test per metric).
+    run_outcomes = [outcomes(r) for r in a.runs]
+    pooled = {name: stats.pooled(base[name], [o[name] for o in run_outcomes], **boot) for name in metric_names}
+    for name, p in stats.holm({n: r["p"] for n, r in pooled.items()}).items():
+        pooled[name] |= {"p_holm": p, "significant": p < a.alpha}
+
+    summary = {"settings": OmegaConf.to_container(a), "runs": per_run, "across_seeds": seeds, "pooled": pooled}
     (out_dir / "summary.json").write_text(json.dumps(summary, indent=2))
     (out_dir / "report.md").write_text(stats.report(summary, base_name=a.base_run), encoding="utf-8")
     (out_dir / "config.yaml").write_text(OmegaConf.to_yaml(cfg))
