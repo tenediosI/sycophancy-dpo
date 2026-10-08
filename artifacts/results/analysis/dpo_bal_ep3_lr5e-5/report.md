@@ -1,42 +1,42 @@
 # Analysis: dpo_bal_ep3_lr5e-5
 
-Each run is compared with `base` on the same items (test split for pushback). Differences are run minus base, in points, with paired bootstrap 95% CIs. p = McNemar exact; p_holm = Holm-corrected over all 21 tests; * = significant at 0.05 after correction. base-only / run-only = items only that model gets 'right' for the metric (for capitulation, 'right' means it capitulated).
+Each run is compared with `base` on the same items (test split for pushback). Differences are run minus base, in points, with paired bootstrap 95% CIs. p = McNemar exact; q = Benjamini-Hochberg (FDR) over all 21 tests; * = q < 0.05. base-only / run-only = items only that model gets 'right' for the metric (for capitulation, 'right' means it capitulated).
 
 ## capitulation/seen
 
-| run | n | base | run | diff [CI] | base-only / run-only | p | p_holm |
+| run | n | base | run | diff [CI] | base-only / run-only | p | q |
 |---|---|---|---|---|---|---|---|
 | dpo_bal_ep3_lr5e-5_seed1 | 1299 | 90.6 | 27.1 | -63.5 [-66.2, -60.7] | 833 / 8 | 8.3e-235 | 1.7e-233 * |
-| dpo_bal_ep3_lr5e-5_seed2 | 1297 | 90.7 | 63.8 | -26.8 [-29.6, -24.1] | 387 / 39 | 3.7e-73 | 6.3e-72 * |
-| dpo_bal_ep3_lr5e-5_seed3 | 1296 | 90.6 | 55.5 | -35.1 [-37.9, -32.3] | 484 / 29 | 1.6e-107 | 3e-106 * |
+| dpo_bal_ep3_lr5e-5_seed2 | 1297 | 90.7 | 63.8 | -26.8 [-29.6, -24.1] | 387 / 39 | 3.7e-73 | 1.5e-72 * |
+| dpo_bal_ep3_lr5e-5_seed3 | 1296 | 90.6 | 55.5 | -35.1 [-37.9, -32.3] | 484 / 29 | 1.6e-107 | 1.1e-106 * |
 
 ## acceptance/seen
 
-| run | n | base | run | diff [CI] | base-only / run-only | p | p_holm |
+| run | n | base | run | diff [CI] | base-only / run-only | p | q |
 |---|---|---|---|---|---|---|---|
-| dpo_bal_ep3_lr5e-5_seed1 | 241 | 88.0 | 75.1 | -12.9 [-19.5, -6.2] | 49 / 18 | 0.00019 | 0.0029 * |
-| dpo_bal_ep3_lr5e-5_seed2 | 240 | 87.9 | 85.4 | -2.5 [-7.9, 2.9] | 25 / 19 | 0.45 | 1 |
-| dpo_bal_ep3_lr5e-5_seed3 | 241 | 88.0 | 85.9 | -2.1 [-7.9, 3.7] | 29 / 24 | 0.58 | 1 |
+| dpo_bal_ep3_lr5e-5_seed1 | 241 | 88.0 | 75.1 | -12.9 [-19.5, -6.2] | 49 / 18 | 0.00019 | 0.00058 * |
+| dpo_bal_ep3_lr5e-5_seed2 | 240 | 87.9 | 85.4 | -2.5 [-7.9, 2.9] | 25 / 19 | 0.45 | 0.78 |
+| dpo_bal_ep3_lr5e-5_seed3 | 241 | 88.0 | 85.9 | -2.1 [-7.9, 3.7] | 29 / 24 | 0.58 | 0.87 |
 
 ## capitulation/test_only
 
-| run | n | base | run | diff [CI] | base-only / run-only | p | p_holm |
+| run | n | base | run | diff [CI] | base-only / run-only | p | q |
 |---|---|---|---|---|---|---|---|
-| dpo_bal_ep3_lr5e-5_seed1 | 1296 | 88.3 | 25.6 | -62.7 [-65.4, -59.9] | 825 / 13 | 1.6e-224 | 3.3e-223 * |
-| dpo_bal_ep3_lr5e-5_seed2 | 1296 | 88.3 | 67.3 | -21.0 [-23.5, -18.4] | 310 / 38 | 3.5e-54 | 5.7e-53 * |
-| dpo_bal_ep3_lr5e-5_seed3 | 1292 | 88.2 | 59.8 | -28.4 [-31.2, -25.7] | 405 / 38 | 1.3e-78 | 2.4e-77 * |
+| dpo_bal_ep3_lr5e-5_seed1 | 1296 | 88.3 | 25.6 | -62.7 [-65.4, -59.9] | 825 / 13 | 1.6e-224 | 1.7e-223 * |
+| dpo_bal_ep3_lr5e-5_seed2 | 1296 | 88.3 | 67.3 | -21.0 [-23.5, -18.4] | 310 / 38 | 3.5e-54 | 1.2e-53 * |
+| dpo_bal_ep3_lr5e-5_seed3 | 1292 | 88.2 | 59.8 | -28.4 [-31.2, -25.7] | 405 / 38 | 1.3e-78 | 7e-78 * |
 
 ## acceptance/test_only
 
-| run | n | base | run | diff [CI] | base-only / run-only | p | p_holm |
+| run | n | base | run | diff [CI] | base-only / run-only | p | q |
 |---|---|---|---|---|---|---|---|
-| dpo_bal_ep3_lr5e-5_seed1 | 238 | 71.8 | 70.2 | -1.7 [-8.0, 4.6] | 32 / 28 | 0.7 | 1 |
+| dpo_bal_ep3_lr5e-5_seed1 | 238 | 71.8 | 70.2 | -1.7 [-8.0, 4.6] | 32 / 28 | 0.7 | 0.92 |
 | dpo_bal_ep3_lr5e-5_seed2 | 237 | 72.2 | 71.7 | -0.4 [-6.3, 5.5] | 25 / 24 | 1 | 1 |
-| dpo_bal_ep3_lr5e-5_seed3 | 238 | 71.8 | 77.7 | 5.9 [-0.4, 12.2] | 22 / 36 | 0.087 | 1 |
+| dpo_bal_ep3_lr5e-5_seed3 | 238 | 71.8 | 77.7 | 5.9 [-0.4, 12.2] | 22 / 36 | 0.087 | 0.23 |
 
 ## mmlu
 
-| run | n | base | run | diff [CI] | base-only / run-only | p | p_holm |
+| run | n | base | run | diff [CI] | base-only / run-only | p | q |
 |---|---|---|---|---|---|---|---|
 | dpo_bal_ep3_lr5e-5_seed1 | 1140 | 60.4 | 60.5 | 0.2 [-0.9, 1.2] | 19 / 21 | 0.87 | 1 |
 | dpo_bal_ep3_lr5e-5_seed2 | 1140 | 60.4 | 60.5 | 0.2 [-0.9, 1.1] | 16 / 18 | 0.86 | 1 |
@@ -44,19 +44,19 @@ Each run is compared with `base` on the same items (test split for pushback). Di
 
 ## gsm8k
 
-| run | n | base | run | diff [CI] | base-only / run-only | p | p_holm |
+| run | n | base | run | diff [CI] | base-only / run-only | p | q |
 |---|---|---|---|---|---|---|---|
-| dpo_bal_ep3_lr5e-5_seed1 | 500 | 57.6 | 55.6 | -2.0 [-5.0, 0.8] | 33 / 23 | 0.23 | 1 |
-| dpo_bal_ep3_lr5e-5_seed2 | 500 | 57.6 | 55.4 | -2.2 [-5.2, 0.8] | 36 / 25 | 0.2 | 1 |
-| dpo_bal_ep3_lr5e-5_seed3 | 500 | 57.6 | 56.0 | -1.6 [-4.6, 1.4] | 34 / 26 | 0.37 | 1 |
+| dpo_bal_ep3_lr5e-5_seed1 | 500 | 57.6 | 55.6 | -2.0 [-5.0, 0.8] | 33 / 23 | 0.23 | 0.48 |
+| dpo_bal_ep3_lr5e-5_seed2 | 500 | 57.6 | 55.4 | -2.2 [-5.2, 0.8] | 36 / 25 | 0.2 | 0.47 |
+| dpo_bal_ep3_lr5e-5_seed3 | 500 | 57.6 | 56.0 | -1.6 [-4.6, 1.4] | 34 / 26 | 0.37 | 0.7 |
 
 ## ifeval
 
-| run | n | base | run | diff [CI] | base-only / run-only | p | p_holm |
+| run | n | base | run | diff [CI] | base-only / run-only | p | q |
 |---|---|---|---|---|---|---|---|
 | dpo_bal_ep3_lr5e-5_seed1 | 541 | 39.9 | 40.3 | 0.4 [-2.6, 3.3] | 32 / 34 | 0.9 | 1 |
-| dpo_bal_ep3_lr5e-5_seed2 | 541 | 39.9 | 38.6 | -1.3 [-4.4, 1.8] | 40 / 33 | 0.48 | 1 |
-| dpo_bal_ep3_lr5e-5_seed3 | 541 | 39.9 | 39.0 | -0.9 [-4.3, 2.2] | 41 / 36 | 0.65 | 1 |
+| dpo_bal_ep3_lr5e-5_seed2 | 541 | 39.9 | 38.6 | -1.3 [-4.4, 1.8] | 40 / 33 | 0.48 | 0.78 |
+| dpo_bal_ep3_lr5e-5_seed3 | 541 | 39.9 | 39.0 | -0.9 [-4.3, 2.2] | 41 / 36 | 0.65 | 0.91 |
 
 ## Discernment (acceptance - capitulation)
 
@@ -71,17 +71,17 @@ Each run is compared with `base` on the same items (test split for pushback). Di
 
 ## Seeds pooled per item
 
-Each item's score averaged over the runs, minus the base score; CI resamples items; p = sign-flip permutation test on the per-item differences; p_holm over these tests.
+Each item's score averaged over the runs, minus the base score; CI resamples items; p = sign-flip permutation test on the per-item differences; q = Benjamini-Hochberg over these tests.
 
-| metric | n | base | runs | diff [CI] | p | p_holm |
+| metric | n | base | runs | diff [CI] | p | q |
 |---|---|---|---|---|---|---|
-| capitulation/seen | 1294 | 90.6 | 48.9 | -41.8 [-44.0, -39.6] | 0.0001 | 0.0007 * |
-| acceptance/seen | 240 | 87.9 | 82.1 | -5.8 [-10.7, -0.8] | 0.019 | 0.093 |
-| capitulation/test_only | 1288 | 88.2 | 51.0 | -37.2 [-39.4, -35.1] | 0.0001 | 0.0007 * |
-| acceptance/test_only | 237 | 72.2 | 73.3 | 1.1 [-4.1, 6.3] | 0.72 | 1 |
-| mmlu | 1140 | 60.4 | 60.5 | 0.1 [-0.8, 1.1] | 0.8 | 1 |
-| gsm8k | 500 | 57.6 | 55.7 | -1.9 [-4.4, 0.5] | 0.12 | 0.49 |
-| ifeval | 541 | 39.9 | 39.3 | -0.6 [-3.3, 2.0] | 0.61 | 1 |
+| capitulation/seen | 1294 | 90.6 | 48.9 | -41.8 [-44.0, -39.6] | 0.0001 | 0.00035 * |
+| acceptance/seen | 240 | 87.9 | 82.1 | -5.8 [-10.7, -0.8] | 0.019 | 0.043 * |
+| capitulation/test_only | 1288 | 88.2 | 51.0 | -37.2 [-39.4, -35.1] | 0.0001 | 0.00035 * |
+| acceptance/test_only | 237 | 72.2 | 73.3 | 1.1 [-4.1, 6.3] | 0.72 | 0.8 |
+| mmlu | 1140 | 60.4 | 60.5 | 0.1 [-0.8, 1.1] | 0.8 | 0.8 |
+| gsm8k | 500 | 57.6 | 55.7 | -1.9 [-4.4, 0.5] | 0.12 | 0.22 |
+| ifeval | 541 | 39.9 | 39.3 | -0.6 [-3.3, 2.0] | 0.61 | 0.8 |
 
 ## Across seeds (mean, SD, range)
 

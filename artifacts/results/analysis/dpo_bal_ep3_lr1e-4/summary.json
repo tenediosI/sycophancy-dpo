@@ -27,7 +27,7 @@
           "base_only": 945,
           "model_only": 7,
           "p": 7.279849564019567e-270,
-          "p_holm": 1.5287684084441092e-268,
+          "q": 1.5287684084441092e-268,
           "significant": true
         },
         "acceptance/seen": {
@@ -42,7 +42,7 @@
           "base_only": 56,
           "model_only": 16,
           "p": 2.397319809534421e-06,
-          "p_holm": 3.5959797143016315e-05,
+          "q": 7.191959428603263e-06,
           "significant": true
         },
         "capitulation/test_only": {
@@ -57,7 +57,7 @@
           "base_only": 946,
           "model_only": 13,
           "p": 3.573918080654018e-260,
-          "p_holm": 6.790444353242634e-259,
+          "q": 2.5017426564578126e-259,
           "significant": true
         },
         "acceptance/test_only": {
@@ -72,7 +72,7 @@
           "base_only": 47,
           "model_only": 33,
           "p": 0.1456354544029827,
-          "p_holm": 1.0,
+          "q": 0.24862831968119864,
           "significant": false
         },
         "mmlu": {
@@ -87,7 +87,7 @@
           "base_only": 43,
           "model_only": 48,
           "p": 0.675222459916057,
-          "p_holm": 1.0,
+          "q": 0.8862294786398248,
           "significant": false
         },
         "gsm8k": {
@@ -102,7 +102,7 @@
           "base_only": 56,
           "model_only": 35,
           "p": 0.0354495948795191,
-          "p_holm": 0.42539513855422917,
+          "q": 0.0744441492469901,
           "significant": false
         },
         "ifeval": {
@@ -117,7 +117,7 @@
           "base_only": 40,
           "model_only": 43,
           "p": 0.8264047244491927,
-          "p_holm": 1.0,
+          "q": 0.9133946954438444,
           "significant": false
         }
       },
@@ -156,7 +156,7 @@
           "base_only": 944,
           "model_only": 10,
           "p": 2.1786933741486833e-264,
-          "p_holm": 4.357386748297367e-263,
+          "q": 2.2876280428561176e-263,
           "significant": true
         },
         "acceptance/seen": {
@@ -171,7 +171,7 @@
           "base_only": 52,
           "model_only": 19,
           "p": 0.000112268646894988,
-          "p_holm": 0.0015717610565298321,
+          "q": 0.0002947051980993435,
           "significant": true
         },
         "capitulation/test_only": {
@@ -186,7 +186,7 @@
           "base_only": 922,
           "model_only": 13,
           "p": 4.305421154359768e-253,
-          "p_holm": 7.319215962411606e-252,
+          "q": 1.8082768848311026e-252,
           "significant": true
         },
         "acceptance/test_only": {
@@ -201,7 +201,7 @@
           "base_only": 34,
           "model_only": 35,
           "p": 1.0,
-          "p_holm": 1.0,
+          "q": 1.0,
           "significant": false
         },
         "mmlu": {
@@ -216,7 +216,7 @@
           "base_only": 39,
           "model_only": 36,
           "p": 0.8175538505509841,
-          "p_holm": 1.0,
+          "q": 0.9133946954438444,
           "significant": false
         },
         "gsm8k": {
@@ -231,7 +231,7 @@
           "base_only": 53,
           "model_only": 38,
           "p": 0.14179337454474714,
-          "p_holm": 1.0,
+          "q": 0.24862831968119864,
           "significant": false
         },
         "ifeval": {
@@ -246,7 +246,7 @@
           "base_only": 42,
           "model_only": 29,
           "p": 0.1539127693264563,
-          "p_holm": 1.0,
+          "q": 0.24862831968119864,
           "significant": false
         }
       },
@@ -285,7 +285,7 @@
           "base_only": 939,
           "model_only": 12,
           "p": 1.1340823373427621e-259,
-          "p_holm": 2.0413482072169718e-258,
+          "q": 5.953932271049501e-259,
           "significant": true
         },
         "acceptance/seen": {
@@ -300,7 +300,7 @@
           "base_only": 51,
           "model_only": 20,
           "p": 0.000303163413558493,
-          "p_holm": 0.003941124376260409,
+          "q": 0.0007073812983031504,
           "significant": true
         },
         "capitulation/test_only": {
@@ -315,7 +315,7 @@
           "base_only": 910,
           "model_only": 16,
           "p": 4.400479648493618e-245,
-          "p_holm": 7.040767437589789e-244,
+          "q": 1.5401678769727664e-244,
           "significant": true
         },
         "acceptance/test_only": {
@@ -330,7 +330,7 @@
           "base_only": 41,
           "model_only": 37,
           "p": 0.7343420330298466,
-          "p_holm": 1.0,
+          "q": 0.9071283937427516,
           "significant": false
         },
         "mmlu": {
@@ -345,7 +345,7 @@
           "base_only": 41,
           "model_only": 40,
           "p": 1.0,
-          "p_holm": 1.0,
+          "q": 1.0,
           "significant": false
         },
         "gsm8k": {
@@ -360,7 +360,7 @@
           "base_only": 46,
           "model_only": 35,
           "p": 0.2664123096713203,
-          "p_holm": 1.0,
+          "q": 0.3996184645069804,
           "significant": false
         },
         "ifeval": {
@@ -375,7 +375,7 @@
           "base_only": 43,
           "model_only": 36,
           "p": 0.499896876860327,
-          "p_holm": 1.0,
+          "q": 0.6998556276044579,
           "significant": false
         }
       },
@@ -541,7 +541,7 @@
         -0.6949152542372882
       ],
       "p": 9.999000099990002e-05,
-      "p_holm": 0.0006999300069993001,
+      "q": 0.00023331000233310002,
       "significant": true
     },
     "acceptance/seen": {
@@ -555,7 +555,7 @@
         -0.08295297372060907
       ],
       "p": 9.999000099990002e-05,
-      "p_holm": 0.0006999300069993001,
+      "q": 0.00023331000233310002,
       "significant": true
     },
     "capitulation/test_only": {
@@ -569,7 +569,7 @@
         -0.6779661016949152
       ],
       "p": 9.999000099990002e-05,
-      "p_holm": 0.0006999300069993001,
+      "q": 0.00023331000233310002,
       "significant": true
     },
     "acceptance/test_only": {
@@ -583,7 +583,7 @@
         0.04201680672268906
       ],
       "p": 0.45485451454854514,
-      "p_holm": 1.0,
+      "q": 0.530663600306636,
       "significant": false
     },
     "mmlu": {
@@ -597,7 +597,7 @@
         0.013742690058479529
       ],
       "p": 0.9999000099990001,
-      "p_holm": 1.0,
+      "q": 0.9999000099990001,
       "significant": false
     },
     "gsm8k": {
@@ -611,7 +611,7 @@
         -0.0020000000000000096
       ],
       "p": 0.039896010398960104,
-      "p_holm": 0.15958404159584041,
+      "q": 0.06981801819818018,
       "significant": false
     },
     "ifeval": {
@@ -625,7 +625,7 @@
         0.015403573629081938
       ],
       "p": 0.40735926407359263,
-      "p_holm": 1.0,
+      "q": 0.530663600306636,
       "significant": false
     }
   }

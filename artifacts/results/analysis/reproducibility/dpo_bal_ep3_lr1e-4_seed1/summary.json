@@ -25,7 +25,7 @@
           "base_only": 34,
           "model_only": 45,
           "p": 0.2604255258972435,
-          "p_holm": 0.7812765776917305,
+          "q": 0.4790445963541667,
           "significant": false
         },
         "acceptance/seen": {
@@ -40,7 +40,7 @@
           "base_only": 8,
           "model_only": 8,
           "p": 1.0,
-          "p_holm": 1.0,
+          "q": 1.0,
           "significant": false
         },
         "capitulation/test_only": {
@@ -55,7 +55,7 @@
           "base_only": 18,
           "model_only": 54,
           "p": 2.568720337924735e-05,
-          "p_holm": 0.0001027488135169894,
+          "q": 0.0001027488135169894,
           "significant": true
         },
         "acceptance/test_only": {
@@ -70,7 +70,7 @@
           "base_only": 7,
           "model_only": 12,
           "p": 0.359283447265625,
-          "p_holm": 0.7812765776917305,
+          "q": 0.4790445963541667,
           "significant": false
         }
       },
@@ -194,7 +194,7 @@
         0.021538461538461538
       ],
       "p": 0.2605739426057394,
-      "p_holm": 0.7817218278172182,
+      "q": 0.48888444488884447,
       "significant": false
     },
     "acceptance/seen": {
@@ -208,7 +208,7 @@
         0.03319502074688797
       ],
       "p": 1.0,
-      "p_holm": 1.0,
+      "q": 1.0,
       "significant": false
     },
     "capitulation/test_only": {
@@ -222,7 +222,7 @@
         0.040769230769230766
       ],
       "p": 9.999000099990002e-05,
-      "p_holm": 0.00039996000399960006,
+      "q": 0.00039996000399960006,
       "significant": true
     },
     "acceptance/test_only": {
@@ -236,7 +236,7 @@
         0.058091286307053944
       ],
       "p": 0.36666333366663334,
-      "p_holm": 0.7817218278172182,
+      "q": 0.48888444488884447,
       "significant": false
     }
   }

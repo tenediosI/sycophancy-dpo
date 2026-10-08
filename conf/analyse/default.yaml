@@ -6,4 +6,4 @@ runs: [dpo_seed1, dpo_seed2, dpo_seed3]
 split: test             # pushback results compared (capability always uses its fixed subsets)
 n_bootstrap: 10000
 confidence: 0.95
-alpha: 0.05             # after Holm correction over every test in the analysis
+alpha: 0.05             # false discovery rate (Benjamini-Hochberg) over every test in the analysis

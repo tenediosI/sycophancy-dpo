@@ -228,11 +228,14 @@ def run_analyse(cfg: DictConfig) -> None:
         }
     metric_names = [name for name in base if all(name in r["metrics"] for r in per_run.values())]
 
-    # Holm over every McNemar test in this analysis (metrics x runs).
-    adjusted = stats.holm({f"{run}|{name}": r["metrics"][name]["p"] for run, r in per_run.items() for name in r["metrics"]})
-    for key, p in adjusted.items():
+    # Multiple-testing correction over every McNemar test in this analysis (metrics x runs):
+    # Benjamini-Hochberg.
+    adjusted = stats.adjust(
+        {f"{run}|{name}": r["metrics"][name]["p"] for run, r in per_run.items() for name in r["metrics"]}, a.alpha
+    )
+    for key, adj in adjusted.items():
         run, name = key.split("|")
-        per_run[run]["metrics"][name] |= {"p_holm": p, "significant": p < a.alpha}
+        per_run[run]["metrics"][name] |= adj
 
     seeds = {
         name: {
@@ -247,11 +250,11 @@ def run_analyse(cfg: DictConfig) -> None:
         }
         for p in stats.PHRASINGS
     }
-    # Seeds pooled per item, with its own Holm family (one test per metric).
+    # Seeds pooled per item, its own family of tests (one per metric).
     run_outcomes = [outcomes(r) for r in a.runs]
     pooled = {name: stats.pooled(base[name], [o[name] for o in run_outcomes], **boot) for name in metric_names}
-    for name, p in stats.holm({n: r["p"] for n, r in pooled.items()}).items():
-        pooled[name] |= {"p_holm": p, "significant": p < a.alpha}
+    for name, adj in stats.adjust({n: r["p"] for n, r in pooled.items()}, a.alpha).items():
+        pooled[name] |= adj
 
     summary = {"settings": OmegaConf.to_container(a), "runs": per_run, "across_seeds": seeds, "pooled": pooled}
     (out_dir / "summary.json").write_text(json.dumps(summary, indent=2))

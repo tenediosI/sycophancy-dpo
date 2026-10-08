@@ -25,7 +25,7 @@
           "base_only": 16,
           "model_only": 31,
           "p": 0.03998605682605215,
-          "p_holm": 0.1599442273042086,
+          "q": 0.1599442273042086,
           "significant": false
         },
         "acceptance/seen": {
@@ -40,7 +40,7 @@
           "base_only": 7,
           "model_only": 7,
           "p": 1.0,
-          "p_holm": 1.0,
+          "q": 1.0,
           "significant": false
         },
         "capitulation/test_only": {
@@ -55,7 +55,7 @@
           "base_only": 18,
           "model_only": 25,
           "p": 0.3603776529357674,
-          "p_holm": 1.0,
+          "q": 0.7207553058715348,
           "significant": false
         },
         "acceptance/test_only": {
@@ -70,7 +70,7 @@
           "base_only": 5,
           "model_only": 7,
           "p": 0.7744140625,
-          "p_holm": 1.0,
+          "q": 1.0,
           "significant": false
         }
       },
@@ -194,7 +194,7 @@
         0.022307692307692306
       ],
       "p": 0.036896310368963105,
-      "p_holm": 0.14758524147585242,
+      "q": 0.14758524147585242,
       "significant": false
     },
     "acceptance/seen": {
@@ -208,7 +208,7 @@
         0.029045643153526972
       ],
       "p": 1.0,
-      "p_holm": 1.0,
+      "q": 1.0,
       "significant": false
     },
     "capitulation/test_only": {
@@ -222,7 +222,7 @@
         0.015384615384615385
       ],
       "p": 0.36366363363663634,
-      "p_holm": 1.0,
+      "q": 0.7273272672732727,
       "significant": false
     },
     "acceptance/test_only": {
@@ -236,7 +236,7 @@
         0.03734439834024896
       ],
       "p": 0.7793220677932207,
-      "p_holm": 1.0,
+      "q": 1.0,
       "significant": false
     }
   }

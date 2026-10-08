@@ -4,7 +4,7 @@ Every model answers the same items (the shared turn-1 eval set and the same benc
 subsets), so each comparison is paired by item:
 - McNemar's exact test on the items where the two models disagree;
 - a paired bootstrap CI for the difference in rates (items resampled, same for both);
-- Holm's correction over every test in the analysis.
+- Benjamini-Hochberg (false discovery rate) correction over every test in the analysis.
 Discernment = correction acceptance - capitulation (0 = the model reacts the same whether
 the user is right or wrong); its CI resamples the two conditions' items separately.
 """
@@ -123,14 +123,21 @@ def pooled(base: dict, models: list[dict], n_bootstrap: int, confidence: float, 
             "diff": float(d.mean()), "diff_ci": ci, "p": float(p)}
 
 
-def holm(pvalues: dict[str, float]) -> dict[str, float]:
-    """Holm-adjusted p-values (family-wise error control), same keys as the input."""
+def benjamini_hochberg(pvalues: dict[str, float]) -> dict[str, float]:
+    """Benjamini-Hochberg adjusted p-values (q-values; false discovery rate control)."""
     order = sorted(pvalues, key=pvalues.get)
-    m, adjusted, running = len(order), {}, 0.0
-    for i, key in enumerate(order):
-        running = max(running, min(1.0, (m - i) * pvalues[key]))
+    m, adjusted, running = len(order), {}, 1.0
+    for rank in range(m, 0, -1):  # from the largest p-value down
+        key = order[rank - 1]
+        running = min(running, pvalues[key] * m / rank)
         adjusted[key] = running
     return adjusted
+
+
+def adjust(pvalues: dict[str, float], alpha: float) -> dict[str, dict]:
+    """Benjamini-Hochberg q-values for one family of tests, and significance at alpha."""
+    q = benjamini_hochberg(pvalues)
+    return {k: {"q": q[k], "significant": q[k] < alpha} for k in pvalues}
 
 
 def report(summary: dict, base_name: str) -> str:
@@ -143,20 +150,20 @@ def report(summary: dict, base_name: str) -> str:
         "",
         f"Each run is compared with `{base_name}` on the same items ({s['split']} split for pushback). "
         f"Differences are run minus base, in points, with paired bootstrap {int(100 * s['confidence'])}% CIs. "
-        f"p = McNemar exact; p_holm = Holm-corrected over all {sum(len(r['metrics']) for r in runs.values())} tests; "
-        f"* = significant at {s['alpha']} after correction. "
+        f"p = McNemar exact; q = Benjamini-Hochberg (FDR) over all {sum(len(r['metrics']) for r in runs.values())} tests; "
+        f"* = q < {s['alpha']}. "
         "base-only / run-only = items only that model gets 'right' for the metric "
         "(for capitulation, 'right' means it capitulated).",
         "",
     ]
     for name in next(iter(runs.values()))["metrics"]:
-        lines += [f"## {name}", "", "| run | n | base | run | diff [CI] | base-only / run-only | p | p_holm |", "|---|---|---|---|---|---|---|---|"]
+        lines += [f"## {name}", "", "| run | n | base | run | diff [CI] | base-only / run-only | p | q |", "|---|---|---|---|---|---|---|---|"]
         for run, r in runs.items():
             m = r["metrics"][name]
             lines.append(
                 f"| {run} | {m['n']} | {pct(m['base'])} | {pct(m['model'])} | "
                 f"{pct(m['diff'])} [{pct(m['diff_ci'][0])}, {pct(m['diff_ci'][1])}] | "
-                f"{m['base_only']} / {m['model_only']} | {m['p']:.2g} | {m['p_holm']:.2g}{' *' if m['significant'] else ''} |"
+                f"{m['base_only']} / {m['model_only']} | {m['p']:.2g} | {m['q']:.2g}{' *' if m['significant'] else ''} |"
             )
         lines.append("")
     lines += ["## Discernment (acceptance - capitulation)", "", "| run | phrasing | base | run | diff [CI] |", "|---|---|---|---|---|"]
@@ -171,16 +178,16 @@ def report(summary: dict, base_name: str) -> str:
             "## Seeds pooled per item",
             "",
             "Each item's score averaged over the runs, minus the base score; CI resamples items; "
-            "p = sign-flip permutation test on the per-item differences; p_holm over these tests.",
+            "p = sign-flip permutation test on the per-item differences; q = Benjamini-Hochberg over these tests.",
             "",
-            "| metric | n | base | runs | diff [CI] | p | p_holm |",
+            "| metric | n | base | runs | diff [CI] | p | q |",
             "|---|---|---|---|---|---|---|",
         ]
         for name, m in summary["pooled"].items():
             lines.append(
                 f"| {name} | {m['n']} | {pct(m['base'])} | {pct(m['model'])} | "
                 f"{pct(m['diff'])} [{pct(m['diff_ci'][0])}, {pct(m['diff_ci'][1])}] | "
-                f"{m['p']:.2g} | {m['p_holm']:.2g}{' *' if m['significant'] else ''} |"
+                f"{m['p']:.2g} | {m['q']:.2g}{' *' if m['significant'] else ''} |"
             )
     lines += ["", "## Across seeds (mean, SD, range)", "", "| metric | run mean (SD) | diff mean (SD) | diff range |", "|---|---|---|---|"]
     for name, a in summary["across_seeds"].items():

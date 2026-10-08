@@ -25,7 +25,7 @@
           "base_only": 26,
           "model_only": 43,
           "p": 0.05328936381651365,
-          "p_holm": 0.2131574552660546,
+          "q": 0.2131574552660546,
           "significant": false
         },
         "acceptance/seen": {
@@ -40,7 +40,7 @@
           "base_only": 4,
           "model_only": 4,
           "p": 1.0,
-          "p_holm": 1.0,
+          "q": 1.0,
           "significant": false
         },
         "capitulation/test_only": {
@@ -55,7 +55,7 @@
           "base_only": 33,
           "model_only": 38,
           "p": 0.6353076420876663,
-          "p_holm": 1.0,
+          "q": 0.8470768561168884,
           "significant": false
         },
         "acceptance/test_only": {
@@ -70,7 +70,7 @@
           "base_only": 5,
           "model_only": 10,
           "p": 0.30175781249999994,
-          "p_holm": 0.9052734374999998,
+          "q": 0.6035156249999999,
           "significant": false
         }
       },
@@ -194,7 +194,7 @@
         0.025384615384615384
       ],
       "p": 0.053594640535946404,
-      "p_holm": 0.21437856214378562,
+      "q": 0.21437856214378562,
       "significant": false
     },
     "acceptance/seen": {
@@ -208,7 +208,7 @@
         0.02074688796680498
       ],
       "p": 1.0,
-      "p_holm": 1.0,
+      "q": 1.0,
       "significant": false
     },
     "capitulation/test_only": {
@@ -222,7 +222,7 @@
         0.016153846153846154
       ],
       "p": 0.6319368063193681,
-      "p_holm": 1.0,
+      "q": 0.8425824084258241,
       "significant": false
     },
     "acceptance/test_only": {
@@ -236,7 +236,7 @@
         0.05394190871369295
       ],
       "p": 0.30116988301169884,
-      "p_holm": 0.9035096490350965,
+      "q": 0.6023397660233977,
       "significant": false
     }
   }

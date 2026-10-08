@@ -34,20 +34,20 @@ minus capitulation (0 = the model reacts the same whether the user is right or w
 | MMLU / GSM8K / IFEval (%) | 60.4 / 57.6 / 39.9 | 60.8 / 56.2 / 39.3 | 60.5 / 55.7 / 39.3 | 60.4 / 54.5 / 38.9 |
 
 Balanced, lr 1e-4 against the base model, seeds pooled per item (95% CI; p = sign-flip
-permutation test, Holm-corrected over the 7 metrics;
+permutation test; q = Benjamini-Hochberg false discovery rate over the 7 metrics;
 [full report](artifacts/results/analysis/dpo_bal_ep3_lr1e-4/report.md)):
 
-| | Difference (points) | p (Holm) |
+| | Difference (points) | q |
 |---|---|---|
 | Capitulation, held-out / seen | -70.3 [-72.7, -67.8] / -71.8 [-74.1, -69.5] | < 0.001 / < 0.001 |
-| Acceptance, held-out / seen | -2.4 [-8.8, 4.2] / -14.4 [-20.3, -8.3] | 1 / < 0.001 |
-| MMLU | 0.0 [-1.3, 1.4] | 1 |
-| GSM8K | -3.1 [-6.1, -0.2] | 0.16 (uncorrected 0.04) |
-| IFEval | -1.0 [-3.7, 1.5] | 1 |
+| Acceptance, held-out / seen | -2.4 [-8.8, 4.2] / -14.4 [-20.3, -8.3] | 0.53 / < 0.001 |
+| MMLU | 0.0 [-1.3, 1.4] | 1.00 |
+| GSM8K | -3.1 [-6.1, -0.2] | 0.07 (uncorrected p 0.04) |
+| IFEval | -1.0 [-3.7, 1.5] | 0.53 |
 
 - **Capitulation falls by about 70 points and generalises to unseen phrasings.**
   Adopting the user's wrong suggestion falls from 57% to 12% (held-out); every seed is
-  significant (McNemar, Holm over 21 tests per configuration).
+  significant (McNemar, false discovery rate over 21 tests per configuration).
 - **Valid corrections are mostly still accepted.** On held-out phrasings the change is
   not significant; on the training phrasings acceptance drops 14 points. Most missed
   corrections are now the model keeping its own wrong answer (21% of held-out cases,
@@ -120,9 +120,9 @@ should be read as the outcome of an exploratory search, not a single pre-registe
 
 Session 6 retrained four models (balanced lr 1e-4 seeds 1-3, and 3:1 seed 1) from the
 same code, data and settings. Their turn-3 answers match the originals on 92.5-95.0% of
-test items and every rate is within 4.1 points; two of the sixteen capitulation and
-acceptance differences (+2.8 and +3.0 points of capitulation) are significant, since GPU
-training is not bit-exact
+test items and every rate is within 4.1 points; three of the sixteen capitulation and
+acceptance differences (capitulation +2.8 and +3.0, acceptance +4.1 points) are
+significant, since GPU training is not bit-exact
 ([reports](artifacts/results/analysis/reproducibility/)). Calibration is measured on the
 retrained models, each joined with its own pushback results.
 
@@ -217,7 +217,8 @@ statement is true?") with unrelated options, none in the subset used.
 ### Statistics
 
 `stage=analyse` compares each run with the base model item by item: McNemar's exact
-test, paired bootstrap CIs (10,000 resamples), Holm's correction over all tests, the mean
+test, paired bootstrap CIs (10,000 resamples), Benjamini-Hochberg false discovery rate
+correction over all tests (q-values), the mean
 and SD over seeds, and a seeds-pooled test per metric (per-item mean over seeds; CI over
 items; sign-flip permutation test). Output: `artifacts/results/analysis/<name>/report.md`.
 
