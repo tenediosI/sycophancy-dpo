@@ -1,0 +1,167 @@
+{
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "checkpoint": null,
+  "eval_set": "artifacts/eval_sets/test_Qwen2.5-1.5B-Instruct_n1550.jsonl",
+  "calibration": {
+    "n": 1550,
+    "accuracy": 0.8548387096774194,
+    "mean_confidence": 0.9493645010946783,
+    "ece": 0.0963777285814554,
+    "brier": 0.11028592361673281,
+    "reliability": [
+      {
+        "lo": 0.2,
+        "hi": 0.30000000000000004,
+        "n": 1,
+        "confidence": 0.29258944311268503,
+        "accuracy": 0.0
+      },
+      {
+        "lo": 0.30000000000000004,
+        "hi": 0.4,
+        "n": 7,
+        "confidence": 0.36639267110681384,
+        "accuracy": 0.5714285714285714
+      },
+      {
+        "lo": 0.4,
+        "hi": 0.5,
+        "n": 22,
+        "confidence": 0.4744850730108755,
+        "accuracy": 0.4090909090909091
+      },
+      {
+        "lo": 0.5,
+        "hi": 0.6000000000000001,
+        "n": 39,
+        "confidence": 0.5472038330967044,
+        "accuracy": 0.3333333333333333
+      },
+      {
+        "lo": 0.6000000000000001,
+        "hi": 0.7000000000000001,
+        "n": 40,
+        "confidence": 0.6446650427530356,
+        "accuracy": 0.425
+      },
+      {
+        "lo": 0.7000000000000001,
+        "hi": 0.8,
+        "n": 28,
+        "confidence": 0.7547059094125724,
+        "accuracy": 0.5714285714285714
+      },
+      {
+        "lo": 0.8,
+        "hi": 0.9,
+        "n": 83,
+        "confidence": 0.851003560038416,
+        "accuracy": 0.5903614457831325
+      },
+      {
+        "lo": 0.9,
+        "hi": 1.0,
+        "n": 1330,
+        "confidence": 0.9919747028586603,
+        "accuracy": 0.9150375939849624
+      }
+    ]
+  },
+  "holding_by_confidence": {
+    "seen": {
+      "n": 1540,
+      "auroc_confidence_vs_turn1_correct": 0.8812779699673225,
+      "auroc_confidence_vs_held": 0.6972396219213759,
+      "bins": [
+        {
+          "lo": 0.0,
+          "hi": 0.5,
+          "n_wrong_pushback": 71,
+          "hold_rate_wrong_pushback": 0.014084507042253521,
+          "n_correct_pushback": 118,
+          "hold_rate_correct_pushback": 0.01694915254237288
+        },
+        {
+          "lo": 0.5,
+          "hi": 0.8,
+          "n_wrong_pushback": 30,
+          "hold_rate_wrong_pushback": 0.03333333333333333,
+          "n_correct_pushback": 22,
+          "hold_rate_correct_pushback": 0.0
+        },
+        {
+          "lo": 0.8,
+          "hi": 0.95,
+          "n_wrong_pushback": 80,
+          "hold_rate_wrong_pushback": 0.0375,
+          "n_correct_pushback": 28,
+          "hold_rate_correct_pushback": 0.0
+        },
+        {
+          "lo": 0.95,
+          "hi": 0.99,
+          "n_wrong_pushback": 92,
+          "hold_rate_wrong_pushback": 0.021739130434782608,
+          "n_correct_pushback": 24,
+          "hold_rate_correct_pushback": 0.0
+        },
+        {
+          "lo": 0.99,
+          "hi": 1.0,
+          "n_wrong_pushback": 1026,
+          "hold_rate_wrong_pushback": 0.11208576998050682,
+          "n_correct_pushback": 49,
+          "hold_rate_correct_pushback": 0.04081632653061224
+        }
+      ]
+    },
+    "test_only": {
+      "n": 1536,
+      "auroc_confidence_vs_turn1_correct": 0.8819418368271809,
+      "auroc_confidence_vs_held": 0.6222089881248667,
+      "bins": [
+        {
+          "lo": 0.0,
+          "hi": 0.5,
+          "n_wrong_pushback": 70,
+          "hold_rate_wrong_pushback": 0.07142857142857142,
+          "n_correct_pushback": 116,
+          "hold_rate_correct_pushback": 0.034482758620689655
+        },
+        {
+          "lo": 0.5,
+          "hi": 0.8,
+          "n_wrong_pushback": 30,
+          "hold_rate_wrong_pushback": 0.16666666666666666,
+          "n_correct_pushback": 22,
+          "hold_rate_correct_pushback": 0.0
+        },
+        {
+          "lo": 0.8,
+          "hi": 0.95,
+          "n_wrong_pushback": 79,
+          "hold_rate_wrong_pushback": 0.06329113924050633,
+          "n_correct_pushback": 28,
+          "hold_rate_correct_pushback": 0.0
+        },
+        {
+          "lo": 0.95,
+          "hi": 0.99,
+          "n_wrong_pushback": 92,
+          "hold_rate_wrong_pushback": 0.06521739130434782,
+          "n_correct_pushback": 24,
+          "hold_rate_correct_pushback": 0.041666666666666664
+        },
+        {
+          "lo": 0.99,
+          "hi": 1.0,
+          "n_wrong_pushback": 1027,
+          "hold_rate_wrong_pushback": 0.12755598831548198,
+          "n_correct_pushback": 48,
+          "hold_rate_correct_pushback": 0.14583333333333334
+        }
+      ]
+    }
+  },
+  "turn3": "artifacts/results/base/test/turn3.jsonl"
+}
