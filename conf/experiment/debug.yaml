@@ -26,6 +26,11 @@ train:
   max_length: 512
   logging_steps: 1
 
+calibration:
+  run_name: debug/base     # joins with results/debug/base/val/turn3.jsonl
+  split: val
+  batch_size: 4
+
 capability:
   run_name: debug
   tasks:

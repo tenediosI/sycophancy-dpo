@@ -1,0 +1,9 @@
+# Step 8: python run.py stage=calibrate calibration.run_name=<run> [model.checkpoint=...]
+# Uses the shared turn-1 eval set of the split; joins with results/<run_name>/<split>/turn3.jsonl
+# when it exists (evaluate the same model first).
+run_name: base          # results go to artifacts/results/<run_name>/calibration/
+split: test
+batch_size: 16
+n_bins: 10              # equal-width confidence bins for ECE and the reliability table
+# Bins of the model's probability for the turn-1 answer, for hold rates by confidence.
+hold_bins: [0.0, 0.5, 0.8, 0.95, 0.99, 1.0]

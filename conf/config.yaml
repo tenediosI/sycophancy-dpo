@@ -7,10 +7,11 @@ defaults:
   - eval: pushback
   - capability: default
   - analyse: default
+  - calibration: default
   - _self_
   - experiment: null   # e.g. experiment=debug for a tiny CPU run on the laptop
 
-# Which pipeline stage to run: split | generate | sft | dpo | evaluate | capability | analyse
+# Which pipeline stage to run: split | generate | sft | dpo | evaluate | capability | calibrate | analyse
 stage: split
 
 # Seed for generation and training. The data split has its own fixed seed

@@ -141,6 +141,28 @@ python run.py stage=evaluate eval.split=test eval.run_name=dpo_seed1 model.check
 python run.py stage=capability capability.run_name=dpo_seed1 model.checkpoint=artifacts/checkpoints/dpo_seed1/merged
 ```
 
+## Calibration
+
+`stage=calibrate` (`conf/calibration/default.yaml`) reads the model's confidence instead
+of asking for it: each test question is posed as in turn 1, the reply is pre-filled with
+`Answer:`, and one forward pass gives the probability of each option letter. This is
+answer-only confidence, without the reasoning of a normal reply. It reports accuracy,
+expected calibration error (10 equal-width bins), Brier score and a reliability table,
+and, joined with the same model's pushback results, how often the model holds its
+turn-1 answer at each level of confidence in it. Two AUROCs summarise that: how well
+confidence separates right from wrong turn-1 answers (what the model knows) and how well
+it predicts holding (whether the model uses it). A model with real discernment holds
+when confident and switches when not. Output in `artifacts/results/<run>/calibration/`.
+
+`scripts/gpu_calibration.sh` is GPU session 6. The trained models of sessions 2 and 5
+were not kept, so it retrains them with the same code, data and settings (`<name>_rerun`:
+balanced 1e-4 seeds 1-3 and session 2's seed 1), evaluates each on test again (GPU
+training is not bit-exact, so confidence is always joined with the model's own
+behaviour; comparing a rerun with its original is a reproducibility check), calibrates
+them and the base model, and optionally uploads an adapter to the Hugging Face Hub as a
+private repo (`HF_REPO=user/name` with `HF_TOKEN` set). `QUICK=1` does the base model and
+the first rerun only.
+
 ## Statistics
 
 `stage=analyse` (`conf/analyse/default.yaml`) compares each trained run with the base

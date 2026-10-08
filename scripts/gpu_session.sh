@@ -50,34 +50,7 @@ PREFIX=${PREFIX:-""}
 EXTRA=${EXTRA:-""}
 BASE="${PREFIX}base"
 
-export GIT_TERMINAL_PROMPT=0
-
-say() { echo "[$(date '+%H:%M:%S')] $*"; }
-
-run() {
-    say "python run.py $* $EXTRA"
-    # shellcheck disable=SC2086  # EXTRA is a list of overrides
-    python run.py "$@" $EXTRA
-}
-
-push() {
-    [ -n "${NO_PUSH:-}" ] && return 0
-    git add -A artifacts
-    if git commit -q -m "Results: $1"; then
-        git push -q || say "Push failed: results are still on the instance disk."
-    fi
-}
-
-finish() {
-    status=$?
-    say "Session ended with status $status"
-    push "GPU session end (status $status)" || true
-    if [ -n "${CONTAINER_ID:-}" ]; then
-        command -v vastai > /dev/null || pip install -q vastai
-        vastai stop instance "$CONTAINER_ID" --api-key "$CONTAINER_API_KEY"
-    fi
-}
-trap finish EXIT
+source "$(dirname "$0")/lib.sh"
 
 say "Session: RUN=$RUN RATIO=$RATIO EPOCHS=$EPOCHS RULE=$RULE LRS=\"$LRS\" SEEDS=\"$SEEDS\""
 
@@ -95,32 +68,13 @@ fi
 [ -f "artifacts/results/$BASE/capability/summary.json" ] || run stage=capability capability.run_name="$BASE"
 push "base model references"
 
-# Steps 3 and 5 skip work whose output exists and redo (overwrite=true) a step that was
-# interrupted half-way.
-train_dpo() {  # name lr seed
-    # The summary is written after the merged model is saved, so it marks a finished run;
-    # the checkpoint must also still be on this disk (it is not pushed).
-    [ -f "artifacts/results/$1/train/summary.json" ] && [ -d "artifacts/checkpoints/$1/merged" ] \
-        && { say "skip training $1 (exists)"; return; }
-    run stage=dpo seed="$3" train.learning_rate="$2" train.run_name="$1" \
-        train.pairs.wrong_per_correct="$RATIO" train.num_train_epochs="$EPOCHS" overwrite=true
-}
-evaluate() {  # name split
-    [ -f "artifacts/results/$1/$2/summary.json" ] && { say "skip $2 eval of $1 (exists)"; return; }
-    run stage=evaluate eval.split="$2" eval.run_name="$1" model.checkpoint="artifacts/checkpoints/$1/merged" overwrite=true
-}
-capability() {  # name
-    [ -f "artifacts/results/$1/capability/summary.json" ] && { say "skip capability of $1 (exists)"; return; }
-    run stage=capability capability.run_name="$1" model.checkpoint="artifacts/checkpoints/$1/merged" overwrite=true
-}
-
 # Steps 5-6 for one learning rate: fresh seeds evaluated on test, then statistics
 # against the base model.
 final_runs() {  # lr stem
     local lr=$1 stem=$2 finals=() name
     for seed in $SEEDS; do
         name="${PREFIX}${stem}_seed${seed}"
-        train_dpo "$name" "$lr" "$seed"
+        train_dpo "$name" "$lr" "$seed" train.pairs.wrong_per_correct="$RATIO" train.num_train_epochs="$EPOCHS"
         evaluate "$name" test
         capability "$name"
         finals+=("$name")
@@ -146,7 +100,7 @@ fi
 sweep=()
 for lr in $LRS; do
     name="${PREFIX}${RUN}_lr${lr}_seed0"
-    train_dpo "$name" "$lr" 0
+    train_dpo "$name" "$lr" 0 train.pairs.wrong_per_correct="$RATIO" train.num_train_epochs="$EPOCHS"
     evaluate "$name" val
     sweep+=("$lr=$name")
 done

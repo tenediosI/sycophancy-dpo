@@ -168,6 +168,40 @@ def run_dpo_stage(cfg: DictConfig) -> None:
     run_dpo(cfg)
 
 
+def run_calibrate(cfg: DictConfig) -> None:
+    """Step 8: answer confidence, calibration, and holding by confidence."""
+    from src.evaluation.calibration import calibration_summary, holding_by_confidence, option_probs
+    from src.models.factory import load_model
+
+    c = cfg.calibration
+    out_dir = prepare_output_dir(Path(cfg.paths.results) / c.run_name / "calibration", cfg.overwrite)
+    records = load_split(cfg, c.split)
+    model_slug = cfg.model.name.split("/")[-1]
+    eval_set_path = Path(cfg.paths.eval_sets) / f"{c.split}_{model_slug}_n{len(records)}.jsonl"
+    items = read_jsonl(eval_set_path)  # the shared turn 1, so p_turn1 refers to the same answers
+    model, tokenizer = load_model(cfg.model)
+
+    rows, summary = calibration_summary(items, option_probs(items, model, tokenizer, cfg), c.n_bins)
+    summary = {
+        "model": cfg.model.name,
+        "checkpoint": cfg.model.checkpoint,
+        "eval_set": str(eval_set_path),
+        "calibration": summary,
+    }
+    turn3_path = Path(cfg.paths.results) / c.run_name / c.split / "turn3.jsonl"
+    if turn3_path.exists():
+        summary["holding_by_confidence"] = holding_by_confidence(rows, read_jsonl(turn3_path), list(c.hold_bins))
+        summary["turn3"] = str(turn3_path)
+    else:
+        log.warning("%s not found: holding by confidence skipped (evaluate this model first).", turn3_path)
+
+    write_jsonl(out_dir / "items.jsonl", rows)
+    (out_dir / "summary.json").write_text(json.dumps(summary, indent=2))
+    (out_dir / "config.yaml").write_text(OmegaConf.to_yaml(cfg))
+    cal = summary["calibration"]
+    log.info("Calibration in %s: accuracy %.3f, ECE %.3f, Brier %.3f", out_dir, cal["accuracy"], cal["ece"], cal["brier"])
+
+
 def run_analyse(cfg: DictConfig) -> None:
     """Step 7: paired tests of each run against the base model, and across seeds."""
     from src.results import stats
@@ -177,9 +211,11 @@ def run_analyse(cfg: DictConfig) -> None:
     results = Path(cfg.paths.results)
 
     def outcomes(run: str) -> dict:
-        return stats.pushback_outcomes(read_jsonl(results / run / a.split / "turn3.jsonl")) | stats.capability_outcomes(
-            read_jsonl(results / run / "capability" / "samples.jsonl")
-        )
+        out = stats.pushback_outcomes(read_jsonl(results / run / a.split / "turn3.jsonl"))
+        capability = results / run / "capability" / "samples.jsonl"
+        if capability.exists():  # e.g. reruns for calibration have no capability results
+            out |= stats.capability_outcomes(read_jsonl(capability))
+        return out
 
     base = outcomes(a.base_run)
     boot = dict(n_bootstrap=a.n_bootstrap, confidence=a.confidence)
@@ -187,12 +223,13 @@ def run_analyse(cfg: DictConfig) -> None:
     for run in a.runs:
         model = outcomes(run)
         per_run[run] = {
-            "metrics": {name: stats.compare(base[name], model[name], **boot) for name in base},
+            "metrics": {name: stats.compare(base[name], model[name], **boot) for name in base if name in model},
             "discernment": {p: stats.discernment(base, model, p, **boot) for p in stats.PHRASINGS},
         }
+    metric_names = [name for name in base if all(name in r["metrics"] for r in per_run.values())]
 
     # Holm over every McNemar test in this analysis (metrics x runs).
-    adjusted = stats.holm({f"{run}|{name}": r["metrics"][name]["p"] for run, r in per_run.items() for name in base})
+    adjusted = stats.holm({f"{run}|{name}": r["metrics"][name]["p"] for run, r in per_run.items() for name in r["metrics"]})
     for key, p in adjusted.items():
         run, name = key.split("|")
         per_run[run]["metrics"][name] |= {"p_holm": p, "significant": p < a.alpha}
@@ -202,7 +239,7 @@ def run_analyse(cfg: DictConfig) -> None:
             "model": stats.across_seeds([per_run[r]["metrics"][name]["model"] for r in a.runs]),
             "diff": stats.across_seeds([per_run[r]["metrics"][name]["diff"] for r in a.runs]),
         }
-        for name in base
+        for name in metric_names
     } | {
         f"discernment/{p}": {
             "model": stats.across_seeds([per_run[r]["discernment"][p]["model"] for r in a.runs]),
@@ -225,6 +262,7 @@ STAGES = {
     "dpo": run_dpo_stage,
     "evaluate": run_evaluate,
     "capability": run_capability_stage,
+    "calibrate": run_calibrate,
     "analyse": run_analyse,
 }
 
