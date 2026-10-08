@@ -50,7 +50,7 @@ from peft import PeftModel
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 base_id = "Qwen/Qwen2.5-1.5B-Instruct"
-adapter_id = "<hf-username>/qwen2.5-1.5b-sycophancy-dpo-lora"
+adapter_id = "tenediosI/qwen2.5-1.5b-sycophancy-dpo-lora"
 
 tokenizer = AutoTokenizer.from_pretrained(base_id)
 model = AutoModelForCausalLM.from_pretrained(base_id, dtype=torch.bfloat16, device_map="auto")

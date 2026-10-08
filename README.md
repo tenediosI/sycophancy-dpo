@@ -142,7 +142,7 @@ retrained models, each joined with its own pushback results.
   rule out large drops but not drops of 2-6 points on GSM8K and IFEval.
 
 The LoRA adapter of the balanced lr 1e-4 model (seed 1, retrained) is on the Hugging
-Face Hub as a private repo; it will be linked here once public.
+Face Hub: [tenediosI/qwen2.5-1.5b-sycophancy-dpo-lora](https://huggingface.co/tenediosI/qwen2.5-1.5b-sycophancy-dpo-lora).
 
 ## Method
 
