@@ -1,0 +1,153 @@
+{
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "checkpoint": "artifacts/checkpoints/dpo_bal_ep3_lr1e-4_seed1_rerun/merged",
+  "eval_set": "artifacts/eval_sets/test_Qwen2.5-1.5B-Instruct_n1550.jsonl",
+  "calibration": {
+    "n": 1550,
+    "accuracy": 0.8580645161290322,
+    "mean_confidence": 0.9922629407026027,
+    "ece": 0.13543312655209097,
+    "brier": 0.13564353767884443,
+    "reliability": [
+      {
+        "lo": 0.4,
+        "hi": 0.5,
+        "n": 3,
+        "confidence": 0.48748965259906085,
+        "accuracy": 0.6666666666666666
+      },
+      {
+        "lo": 0.5,
+        "hi": 0.6000000000000001,
+        "n": 3,
+        "confidence": 0.5631263718830793,
+        "accuracy": 0.0
+      },
+      {
+        "lo": 0.6000000000000001,
+        "hi": 0.7000000000000001,
+        "n": 7,
+        "confidence": 0.6543767155498986,
+        "accuracy": 0.7142857142857143
+      },
+      {
+        "lo": 0.7000000000000001,
+        "hi": 0.8,
+        "n": 8,
+        "confidence": 0.7531558653335173,
+        "accuracy": 0.25
+      },
+      {
+        "lo": 0.8,
+        "hi": 0.9,
+        "n": 16,
+        "confidence": 0.8569926679315756,
+        "accuracy": 0.4375
+      },
+      {
+        "lo": 0.9,
+        "hi": 1.0,
+        "n": 1513,
+        "confidence": 0.9983727319214573,
+        "accuracy": 0.8684732319894249
+      }
+    ]
+  },
+  "holding_by_confidence": {
+    "seen": {
+      "n": 1541,
+      "auroc_confidence_vs_turn1_correct": 0.8496393233322694,
+      "auroc_confidence_vs_held": 0.8921204789633397,
+      "bins": [
+        {
+          "lo": 0.0,
+          "hi": 0.5,
+          "n_wrong_pushback": 71,
+          "hold_rate_wrong_pushback": 0.028169014084507043,
+          "n_correct_pushback": 127,
+          "hold_rate_correct_pushback": 0.015748031496062992
+        },
+        {
+          "lo": 0.5,
+          "hi": 0.8,
+          "n_wrong_pushback": 4,
+          "hold_rate_wrong_pushback": 0.25,
+          "n_correct_pushback": 3,
+          "hold_rate_correct_pushback": 0.0
+        },
+        {
+          "lo": 0.8,
+          "hi": 0.95,
+          "n_wrong_pushback": 9,
+          "hold_rate_wrong_pushback": 0.3333333333333333,
+          "n_correct_pushback": 4,
+          "hold_rate_correct_pushback": 0.0
+        },
+        {
+          "lo": 0.95,
+          "hi": 0.99,
+          "n_wrong_pushback": 11,
+          "hold_rate_wrong_pushback": 0.09090909090909091,
+          "n_correct_pushback": 3,
+          "hold_rate_correct_pushback": 0.3333333333333333
+        },
+        {
+          "lo": 0.99,
+          "hi": 1.0,
+          "n_wrong_pushback": 1205,
+          "hold_rate_wrong_pushback": 0.8655601659751038,
+          "n_correct_pushback": 104,
+          "hold_rate_correct_pushback": 0.41346153846153844
+        }
+      ]
+    },
+    "test_only": {
+      "n": 1541,
+      "auroc_confidence_vs_turn1_correct": 0.8496393233322694,
+      "auroc_confidence_vs_held": 0.8892959495409261,
+      "bins": [
+        {
+          "lo": 0.0,
+          "hi": 0.5,
+          "n_wrong_pushback": 71,
+          "hold_rate_wrong_pushback": 0.056338028169014086,
+          "n_correct_pushback": 127,
+          "hold_rate_correct_pushback": 0.015748031496062992
+        },
+        {
+          "lo": 0.5,
+          "hi": 0.8,
+          "n_wrong_pushback": 4,
+          "hold_rate_wrong_pushback": 0.25,
+          "n_correct_pushback": 3,
+          "hold_rate_correct_pushback": 0.0
+        },
+        {
+          "lo": 0.8,
+          "hi": 0.95,
+          "n_wrong_pushback": 9,
+          "hold_rate_wrong_pushback": 0.5555555555555556,
+          "n_correct_pushback": 4,
+          "hold_rate_correct_pushback": 0.25
+        },
+        {
+          "lo": 0.95,
+          "hi": 0.99,
+          "n_wrong_pushback": 11,
+          "hold_rate_wrong_pushback": 0.45454545454545453,
+          "n_correct_pushback": 3,
+          "hold_rate_correct_pushback": 0.3333333333333333
+        },
+        {
+          "lo": 0.99,
+          "hi": 1.0,
+          "n_wrong_pushback": 1205,
+          "hold_rate_wrong_pushback": 0.8589211618257261,
+          "n_correct_pushback": 104,
+          "hold_rate_correct_pushback": 0.4230769230769231
+        }
+      ]
+    }
+  },
+  "turn3": "artifacts/results/dpo_bal_ep3_lr1e-4_seed1_rerun/test/turn3.jsonl"
+}
